@@ -12,12 +12,14 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { HeaderComponent } from './components/header/header.component';
 import { SearchbarComponent } from './components/searchbar/searchbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
+import { TreeComponent } from './components/tree/tree.component';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, SearchbarComponent, ToolbarComponent],
+  declarations: [AppComponent, HeaderComponent, SearchbarComponent, ToolbarComponent, TreeComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -31,6 +33,7 @@ import { ToolbarComponent } from './components/toolbar/toolbar.component';
     FormsModule,
     ReactiveFormsModule,
     MatCheckboxModule,
+    TreeModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
