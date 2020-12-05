@@ -1,0 +1,26 @@
+<button
+  mat-fab
+  class="add-button"
+  [mdePopoverTriggerFor]="addEntryPopover"
+  mdePopoverTriggerOn="click"
+  #popoverTrigger="mdePopoverTrigger"
+>
+  <mat-icon>add</mat-icon>
+</button>
+
+<mde-popover
+  [mdePopoverOverlapTrigger]="true"
+  [mdePopoverCloseOnClick]="false"
+  #addEntryPopover="mdePopover"
+>
+  <mat-card class="card">
+    <mat-tab-group>
+      <mat-tab label="Food">
+        <app-add-food-tab></app-add-food-tab>
+      </mat-tab>
+      <mat-tab label="Tag">
+        <app-add-tag-tab></app-add-tag-tab>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</mde-popover>

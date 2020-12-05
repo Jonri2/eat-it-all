@@ -19,6 +19,9 @@ import { HeaderComponent } from './components/header/header.component';
 import { SearchbarComponent } from './components/searchbar/searchbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { MultipleAutocompleteComponent } from './components/multiple-autocomplete/multiple-autocomplete.component';
+import { AddPopoverComponent } from './components/add-popover/add-popover.component';
+import { AddFoodTabComponent } from './components/add-food-tab/add-food-tab.component';
+import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +30,9 @@ import { MultipleAutocompleteComponent } from './components/multiple-autocomplet
     SearchbarComponent,
     ToolbarComponent,
     MultipleAutocompleteComponent,
+    AddPopoverComponent,
+    AddFoodTabComponent,
+    AddTagTabComponent,
   ],
   imports: [
     BrowserModule,

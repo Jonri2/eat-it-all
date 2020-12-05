@@ -13,5 +13,9 @@ body {
   overflow: hidden !important;
 }
 
+button:focus {
+  outline: none !important;
+}
+
 /* Importing Bootstrap SCSS file. */
 @import "~bootstrap/dist/css/bootstrap";

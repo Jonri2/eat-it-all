@@ -1,63 +1,7 @@
 <app-header></app-header>
 <app-toolbar></app-toolbar>
 
-<button
-  mat-fab
-  class="add-button"
-  [mdePopoverTriggerFor]="addEntryPopover"
-  mdePopoverTriggerOn="click"
-  #popoverTrigger="mdePopoverTrigger"
->
-  <mat-icon>add</mat-icon>
-</button>
-
-<mde-popover
-  #addEntryPopover="mdePopover"
-  [mdePopoverOverlapTrigger]="true"
-  [mdePopoverCloseOnClick]="false"
->
-  <mat-card class="card">
-    <mat-tab-group>
-      <mat-tab label="Food">
-        <mat-form-field class="form-field">
-          <mat-label>Name</mat-label>
-          <input matInput />
-        </mat-form-field>
-        <app-multiple-autocomplete
-          placeholder="Tags"
-          width="100%"
-        ></app-multiple-autocomplete>
-        <mat-form-field class="form-field">
-          <mat-label>Location</mat-label>
-          <input matInput />
-        </mat-form-field>
-        <mat-form-field class="form-field">
-          <mat-label>Date</mat-label>
-          <input matInput type="date" />
-        </mat-form-field>
-        <div>
-          <ngb-rating
-            class="rating"
-            [rate]="currentRate"
-            [max]="5"
-          ></ngb-rating>
-        </div>
-        <button mat-raised-button color="primary">Submit</button>
-      </mat-tab>
-      <mat-tab label="Tag">
-        <mat-form-field class="form-field">
-          <mat-label>Name</mat-label>
-          <input matInput />
-        </mat-form-field>
-        <app-multiple-autocomplete
-          placeholder="Subtags"
-          width="100%"
-        ></app-multiple-autocomplete>
-        <button mat-raised-button color="primary">Submit</button>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card>
-</mde-popover>
+<app-add-popover></app-add-popover>
 
 <button mat-fab class="edit-button">
   <mat-icon>edit</mat-icon>
