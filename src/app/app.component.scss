@@ -1,1 +1,14 @@
+.form-field,
+.card {
+  display: block;
+  width: 100%;
+}
 
+button:focus {
+  outline: none;
+}
+
+.rating {
+  outline: none;
+  font-size: 30pt;
+}
