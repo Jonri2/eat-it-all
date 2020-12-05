@@ -15,6 +15,7 @@ import { MdePopoverModule } from '@material-extended/mde';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { HeaderComponent } from './components/header/header.component';
 import { SearchbarComponent } from './components/searchbar/searchbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
@@ -22,6 +23,7 @@ import { MultipleAutocompleteComponent } from './components/multiple-autocomplet
 import { AddPopoverComponent } from './components/add-popover/add-popover.component';
 import { AddFoodTabComponent } from './components/add-food-tab/add-food-tab.component';
 import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.component';
+import { TreeComponent } from './components/tree/tree.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +35,7 @@ import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.compone
     AddPopoverComponent,
     AddFoodTabComponent,
     AddTagTabComponent,
+    TreeComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,6 +54,7 @@ import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.compone
     MatCardModule,
     MatTabsModule,
     NgbModule,
+    TreeModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
