@@ -1,8 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { TreeModel, TreeNode } from '@circlon/angular-tree-component';
+import { TreeModel, TreeNode, TreeVirtualScroll } from '@circlon/angular-tree-component';
 
 // TODO: is this where I import it?
 import { TreeService } from 'src/app/services/tree.service';
+import { fuzzySearch } from 'src/app/utils';
+
+interface SelectedValues {
+  selectedValues: string[];
+}
 
 @Component({
   selector: 'app-tree',
@@ -10,6 +15,9 @@ import { TreeService } from 'src/app/services/tree.service';
   styleUrls: ['./tree.component.scss'],
 })
 export class TreeComponent implements OnInit {
+  // get handle an tree template variable
+  @ViewChild('tree') tree: any;
+
   nodes = [];
   treeOptions = {
     allowDrag: true,
@@ -19,42 +27,17 @@ export class TreeComponent implements OnInit {
     animateAcceleration: 1.3,
   };
 
-  filterTree = (value: string, treeModel: TreeModel) => {
-    treeModel.filterNodes((node: TreeNode) => fuzzySearch(value, node.data.name));
-  }
+  /* will filter the tree and only display nodes that match selected values */
+  filterTree = (inputObj: SelectedValues, treeModel: TreeModel) => {
+    treeModel.filterNodes((node: TreeNode) =>
+      fuzzySearch(inputObj.selectedValues, node.data.name)
+    );
+  };
 
   constructor(treeSvc: TreeService) {
-    this.nodes = treeSvc.getNodes()
+    this.nodes = treeSvc.getNodes();
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-}
-
-/* ref: https://github.com/CirclonGroup/angular-tree-component/blob/master/projects/example-app/src/app/filter/filter.component.ts */
-const fuzzySearch = (needle: string, haystack: string) => {
-  const haystackLC = haystack.toLowerCase();
-  const needleLC = needle.toLowerCase();
-
-  const hLen = haystack.length;
-  const nLen = needleLC.length;
-
-  if (nLen > hLen) {
-    return false;
-  }
-  if (nLen === hLen) {
-    return needleLC === haystackLC;
-  }
-  outer: for (let i = 0, j = 0; i < nLen; i++) {
-    const nch = needleLC.charCodeAt(i);
-
-    while (j < hLen) {
-      if (haystackLC.charCodeAt(j++) === nch) {
-        continue outer;
-      }
-    }
-    return false;
-  }
-  return true;
 }
