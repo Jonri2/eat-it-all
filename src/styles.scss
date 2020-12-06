@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@circlon/angular-tree-component/css/angular-tree-component.css";
+@import "~bootstrap/dist/css/bootstrap";
 
 html,
 body {
@@ -8,4 +9,12 @@ body {
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-tab-body-content {
+  overflow: hidden !important;
+}
+
+button:focus {
+  outline: none !important;
 }
