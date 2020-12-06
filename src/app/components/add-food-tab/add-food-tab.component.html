@@ -1,0 +1,20 @@
+<mat-form-field class="form-field">
+  <mat-label>Name</mat-label>
+  <input matInput />
+</mat-form-field>
+<app-multiple-autocomplete
+  placeholder="Tags"
+  width="100%"
+></app-multiple-autocomplete>
+<mat-form-field class="form-field">
+  <mat-label>Location</mat-label>
+  <input matInput />
+</mat-form-field>
+<mat-form-field class="form-field">
+  <mat-label>Date</mat-label>
+  <input matInput type="date" />
+</mat-form-field>
+<div>
+  <ngb-rating class="rating" [rate]="currentRate" [max]="5"></ngb-rating>
+</div>
+<button mat-raised-button color="primary">Submit</button>
