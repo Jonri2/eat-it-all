@@ -17,9 +17,10 @@ import { HeaderComponent } from './components/header/header.component';
 import { SearchbarComponent } from './components/searchbar/searchbar.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { TreeComponent } from './components/tree/tree.component';
+import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-node-expander.component';
 
 @NgModule({
-  declarations: [AppComponent, HeaderComponent, SearchbarComponent, ToolbarComponent, TreeComponent],
+  declarations: [AppComponent, HeaderComponent, SearchbarComponent, ToolbarComponent, TreeComponent, TreeNodeExpanderComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

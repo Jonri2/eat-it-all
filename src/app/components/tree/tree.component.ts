@@ -14,6 +14,9 @@ export class TreeComponent implements OnInit {
   treeOptions = {
     allowDrag: true,
     allowDrop: true,
+    animateExpand: true,
+    animateSpeed: 5,
+    animateAcceleration: 1.3,
   };
 
   constructor(treeSvc: TreeService) {

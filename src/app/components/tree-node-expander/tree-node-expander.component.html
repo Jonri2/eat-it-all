@@ -1,0 +1,13 @@
+<!-- ref: https://github.com/CirclonGroup/angular-tree-component/issues/674 -->
+<button
+  mat-icon-button
+  *ngIf="node.hasChildren"
+  (click)="node.toggleExpanded()"
+>
+  <mat-icon *ngIf="!node?.isExpanded" aria-hidden="false" aria-label="expand"
+    >chevron_right
+  </mat-icon>
+  <mat-icon *ngIf="node?.isExpanded" aria-hidden="false" aria-label="expand"
+    >expand_more
+  </mat-icon>
+</button>
