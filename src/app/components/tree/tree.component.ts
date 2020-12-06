@@ -9,7 +9,6 @@ import { TreeService } from 'src/app/services/tree.service';
   styleUrls: ['./tree.component.scss'],
 })
 export class TreeComponent implements OnInit {
-  // TODO: will need to add polyfill for mobile to work: https://angular2-tree.readme.io/v8.2.0/docs/drag-drop#mobile
   nodes = [];
   treeOptions = {
     allowDrag: true,
