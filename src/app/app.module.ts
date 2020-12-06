@@ -24,6 +24,7 @@ import { AddPopoverComponent } from './components/add-popover/add-popover.compon
 import { AddFoodTabComponent } from './components/add-food-tab/add-food-tab.component';
 import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.component';
 import { TreeComponent } from './components/tree/tree.component';
+import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-node-expander.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { TreeComponent } from './components/tree/tree.component';
     AddFoodTabComponent,
     AddTagTabComponent,
     TreeComponent,
+    TreeNodeExpanderComponent
   ],
   imports: [
     BrowserModule,

@@ -1,1 +1,24 @@
-<tree-root [nodes]="nodes" [options]="treeOptions"></tree-root>
+<!-- ref: https://angular2-tree.readme.io/docs/templates
+  Note: there is another level of more advanced customization if needed.
+-->
+<tree-root [nodes]="nodes" [options]="treeOptions">
+  <ng-template #treeNodeWrapperTemplate let-node let-index="index">
+    <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
+      <app-tree-node-expander [node]=node></app-tree-node-expander>
+
+      <div class="node-content-wrapper"
+        [class.node-content-wrapper-active]="node.isActive"
+        [class.node-content-wrapper-focused]="node.isFocused"
+        (click)="node.mouseAction('click', $event)"
+        (dblclick)="node.mouseAction('dblClick', $event)"
+        (contextmenu)="node.mouseAction('contextMenu', $event)"
+        (treeDrop)="node.onDrop($event)"
+        [treeAllowDrop]="node.allowDrop"
+        [treeDrag]="node"
+        [treeDragEnabled]="node.allowDrag()">
+
+        <tree-node-content [node]="node" [index]="index"></tree-node-content>
+      </div>
+    </div>
+  </ng-template>
+</tree-root>
