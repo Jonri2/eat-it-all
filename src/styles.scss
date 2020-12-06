@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@circlon/angular-tree-component/css/angular-tree-component.css";
+@import "~bootstrap/dist/css/bootstrap";
 
 html,
 body {
@@ -17,6 +18,3 @@ body {
 button:focus {
   outline: none !important;
 }
-
-/* Importing Bootstrap SCSS file. */
-@import "~bootstrap/dist/css/bootstrap";
