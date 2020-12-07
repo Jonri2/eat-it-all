@@ -1,7 +1,7 @@
 <!-- ref: https://angular2-tree.readme.io/docs/templates
   Note: there is another level of more advanced customization if needed.
 -->
-<tree-root #tree [nodes]="nodes" [options]="treeOptions">
+<tree-root #myCoolTree [nodes]="nodes" [options]="treeOptions">
   <ng-template #treeNodeWrapperTemplate let-node let-index="index">
     <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
       <app-tree-node-expander [node]=node></app-tree-node-expander>
@@ -23,14 +23,14 @@
   </ng-template>
 </tree-root>
 
-<app-multiple-autocomplete
+<!-- <app-multiple-autocomplete
   #search
   width="50vw"
   placeholder="Search"
-  [onChange]="filterTree(search, tree.treeModel)"
+  [callback]="filterTree(search, tree.treeModel)"
   ></app-multiple-autocomplete>
 
 <div class="search-checkbox-container">
   <mat-checkbox class="search-checkbox">Food</mat-checkbox>
   <mat-checkbox class="search-checkbox">Tags</mat-checkbox>
-</div>
+</div> -->

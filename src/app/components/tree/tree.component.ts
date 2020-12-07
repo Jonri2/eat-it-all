@@ -1,13 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { TreeModel, TreeNode, TreeVirtualScroll } from '@circlon/angular-tree-component';
-
-// TODO: is this where I import it?
+import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
-import { fuzzySearch } from 'src/app/utils';
-
-interface SelectedValues {
-  selectedValues: string[];
-}
 
 @Component({
   selector: 'app-tree',
@@ -16,7 +9,7 @@ interface SelectedValues {
 })
 export class TreeComponent implements OnInit {
   // get handle an tree template variable
-  @ViewChild('tree') tree: any;
+  @ViewChild('myCoolTree') tree: any;
 
   nodes = [];
   treeOptions = {
@@ -27,17 +20,16 @@ export class TreeComponent implements OnInit {
     animateAcceleration: 1.3,
   };
 
-  /* will filter the tree and only display nodes that match selected values */
-  filterTree = (inputObj: SelectedValues, treeModel: TreeModel) => {
-    treeModel.filterNodes((node: TreeNode) =>
-      fuzzySearch(inputObj.selectedValues, node.data.name)
-    );
-  };
-
-  constructor(treeSvc: TreeService) {
-    this.nodes = treeSvc.getNodes();
+  constructor(
+    private treeSvc: TreeService,
+    private sharedDataSvc: SharedTreeDataService
+  ) {
+    this.nodes = this.treeSvc.getNodes();
   }
 
   ngOnInit(): void {}
 
+  ngAfterViewInit(): void {
+    this.sharedDataSvc.tree = this.tree;
+  }
 }
