@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
 import { pickBy, identity } from 'lodash';
 import { v4 } from 'uuid';
+import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -16,11 +17,15 @@ export class AddFoodTabComponent {
     location: undefined,
     date: undefined,
   };
+  currentRate = 0;
+  @Output() submitted: EventEmitter<boolean> = new EventEmitter();
+  @ViewChild(MultipleAutocompleteComponent)
+  tagsComponent: MultipleAutocompleteComponent;
 
   constructor(private treeSvc: TreeService) {}
 
   onRateChange = (rating: number) => {
-    this.node.rating = rating;
+    this.currentRate = rating;
   };
 
   onTagsChange = (tags: string[]) => {
@@ -29,8 +34,18 @@ export class AddFoodTabComponent {
 
   onSubmit = () => {
     this.node.id = v4();
+    this.node.rating = this.currentRate;
     // Remove all falsy values
     this.node = pickBy(this.node, identity);
     this.treeSvc.addNode(this.node);
+    this.node = {
+      id: '',
+      name: '',
+      location: undefined,
+      date: undefined,
+    };
+    this.currentRate = 0;
+    this.tagsComponent.clearSelections();
+    this.submitted.emit(true);
   };
 }

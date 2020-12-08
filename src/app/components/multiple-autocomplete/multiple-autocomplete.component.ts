@@ -118,6 +118,10 @@ export class MultipleAutocompleteComponent {
     this.values.emit(this.selectedValues);
   };
 
+  clearSelections = () => {
+    this.selectedValues = [];
+  };
+
   private _filter = (value: string): string[] => {
     const filterValue = value.toLowerCase();
 
