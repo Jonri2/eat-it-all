@@ -35,10 +35,7 @@ export class SearchbarComponent {
         : this._generateListOfFilteredNodes(selectedValues, node)
     );
     this.listOfFilteredNodes.forEach((node: TreeNode) => {
-      node.children.forEach((child: TreeNode) => {
-        child.show();
-        // May need to do this recursively....
-      });
+      this._recursivelyShowChildren(node);
     });
     this._shouldCollapseTree(searchHasNoContent);
   }
@@ -49,6 +46,16 @@ export class SearchbarComponent {
       this.sharedDataSvc.tree.treeModel.collapseAll();
     }
   };
+
+  /* show all children for a node, recursively.
+    The base case is handled by node.children?
+  */
+  private _recursivelyShowChildren(node: TreeNode) {
+    node.children?.forEach((child: TreeNode) => {
+      child.show();
+      this._recursivelyShowChildren(child);
+    });
+  }
 
   /* Check if the node searched for exists and make a list.
     Return: true, if the node exists, false otherwise.
