@@ -28,6 +28,8 @@ import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { firebaseConfig } from './credentials';
+import { SharedTreeDataService } from './services/shared-tree-data.service';
+import { TreeService } from './services/tree.service';
 
 @NgModule({
   declarations: [
@@ -63,7 +65,7 @@ import { firebaseConfig } from './credentials';
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
   ],
-  providers: [],
+  providers: [SharedTreeDataService, TreeService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

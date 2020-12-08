@@ -76,12 +76,9 @@ export class MultipleAutocompleteComponent {
   };
 
   /* Runs when the model changes (ngModelChange)
-    To throttle being called, the debounce is set to 60 ms.
-  */
+   */
   onChange = () => {
-    this.searchCtrl.valueChanges
-      .pipe(debounceTime(60), distinctUntilChanged())
-      .subscribe(this.callback);
+    this.callback();
   };
 
   add = (event: MatChipInputEvent): void => {
@@ -109,6 +106,7 @@ export class MultipleAutocompleteComponent {
       this.selectedValues.splice(index, 1);
     }
     this.values.emit(this.selectedValues);
+    this.callback();
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
