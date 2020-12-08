@@ -26,6 +26,8 @@ import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.compone
 import { TreeComponent } from './components/tree/tree.component';
 import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-node-expander.component';
 import { FoodCounterComponent } from './components/food-counter/food-counter.component';
+import { SharedTreeDataService } from './services/shared-tree-data.service';
+import { TreeService } from './services/tree.service';
 
 @NgModule({
   declarations: [
@@ -39,7 +41,7 @@ import { FoodCounterComponent } from './components/food-counter/food-counter.com
     AddTagTabComponent,
     TreeComponent,
     TreeNodeExpanderComponent,
-    FoodCounterComponent
+    FoodCounterComponent,
   ],
   imports: [
     BrowserModule,
@@ -60,7 +62,7 @@ import { FoodCounterComponent } from './components/food-counter/food-counter.com
     NgbModule,
     TreeModule,
   ],
-  providers: [],
+  providers: [SharedTreeDataService, TreeService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

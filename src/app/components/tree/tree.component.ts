@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-
-// TODO: is this where I import it?
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 
 @Component({
@@ -9,6 +8,9 @@ import { TreeService } from 'src/app/services/tree.service';
   styleUrls: ['./tree.component.scss'],
 })
 export class TreeComponent implements OnInit {
+  // get handle an tree template variable
+  @ViewChild('myCoolTree') tree: any;
+
   nodes = [];
   treeOptions = {
     allowDrag: true,
@@ -18,11 +20,16 @@ export class TreeComponent implements OnInit {
     animateAcceleration: 1.3,
   };
 
-  constructor(treeSvc: TreeService) {
-    this.nodes = treeSvc.getNodes()
+  constructor(
+    private treeSvc: TreeService,
+    private sharedDataSvc: SharedTreeDataService
+  ) {
+    this.nodes = this.treeSvc.getNodes();
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
+  ngAfterViewInit(): void {
+    this.sharedDataSvc.tree = this.tree;
+  }
 }
