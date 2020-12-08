@@ -1,20 +1,31 @@
-<mat-form-field class="form-field">
-  <mat-label>Name</mat-label>
-  <input matInput />
-</mat-form-field>
-<app-multiple-autocomplete
-  placeholder="Tags"
-  width="100%"
-></app-multiple-autocomplete>
-<mat-form-field class="form-field">
-  <mat-label>Location</mat-label>
-  <input matInput />
-</mat-form-field>
-<mat-form-field class="form-field">
-  <mat-label>Date</mat-label>
-  <input matInput type="date" />
-</mat-form-field>
-<div>
-  <ngb-rating class="rating" [rate]="currentRate" [max]="5"></ngb-rating>
-</div>
-<button mat-raised-button color="primary">Submit</button>
+<form #f="ngForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="form-field">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="node.name" required name="name" />
+  </mat-form-field>
+  <app-multiple-autocomplete
+    placeholder="Tags"
+    width="100%"
+    (values)="onTagsChange($event)"
+    [separatorKeysCodes]="[]"
+  ></app-multiple-autocomplete>
+  <mat-form-field class="form-field">
+    <mat-label>Location</mat-label>
+    <input matInput [(ngModel)]="node.location" name="location" />
+  </mat-form-field>
+  <mat-form-field class="form-field">
+    <mat-label>Date</mat-label>
+    <input matInput type="date" [(ngModel)]="node.date" name="date" />
+  </mat-form-field>
+  <div>
+    <ngb-rating
+      class="rating"
+      (rateChange)="onRateChange($event)"
+      [rate]="currentRate"
+      [max]="5"
+    ></ngb-rating>
+  </div>
+  <button mat-raised-button color="primary" type="submit" [disabled]="!f.valid">
+    Submit
+  </button>
+</form>

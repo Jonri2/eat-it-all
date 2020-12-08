@@ -16,7 +16,7 @@
   <mat-card class="card">
     <mat-tab-group>
       <mat-tab label="Food">
-        <app-add-food-tab></app-add-food-tab>
+        <app-add-food-tab (submitted)="closePopover()"></app-add-food-tab>
       </mat-tab>
       <mat-tab label="Tag">
         <app-add-tag-tab></app-add-tag-tab>

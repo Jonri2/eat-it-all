@@ -25,6 +25,9 @@ import { AddFoodTabComponent } from './components/add-food-tab/add-food-tab.comp
 import { AddTagTabComponent } from './components/add-tag-tab/add-tag-tab.component';
 import { TreeComponent } from './components/tree/tree.component';
 import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-node-expander.component';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { firebaseConfig } from './credentials';
 import { SharedTreeDataService } from './services/shared-tree-data.service';
 import { TreeService } from './services/tree.service';
 
@@ -59,6 +62,8 @@ import { TreeService } from './services/tree.service';
     MatTabsModule,
     NgbModule,
     TreeModule,
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFirestoreModule,
   ],
   providers: [SharedTreeDataService, TreeService],
   bootstrap: [AppComponent],
