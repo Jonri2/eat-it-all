@@ -1,7 +1,7 @@
 <!-- ref: https://angular2-tree.readme.io/docs/templates
   Note: there is another level of more advanced customization if needed.
 -->
-<tree-root [nodes]="nodes" [options]="treeOptions">
+<tree-root #myCoolTree [nodes]="nodes" [options]="treeOptions">
   <ng-template #treeNodeWrapperTemplate let-node let-index="index">
     <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
       <app-tree-node-expander [node]=node></app-tree-node-expander>
