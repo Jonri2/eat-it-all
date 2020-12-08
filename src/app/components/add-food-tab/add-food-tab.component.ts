@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { TreeService } from 'src/app/services/tree.service';
+import { Node } from '../../interfaces/interfaces';
+import { pickBy, identity } from 'lodash';
+import { v4 } from 'uuid';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -6,5 +10,27 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./add-food-tab.component.scss'],
 })
 export class AddFoodTabComponent {
-  currentRate = 0;
+  node: Node = {
+    id: '',
+    name: '',
+    location: undefined,
+    date: undefined,
+  };
+
+  constructor(private treeSvc: TreeService) {}
+
+  onRateChange = (rating: number) => {
+    this.node.rating = rating;
+  };
+
+  onTagsChange = (tags: string[]) => {
+    this.node.tags = tags;
+  };
+
+  onSubmit = () => {
+    this.node.id = v4();
+    // Remove all falsy values
+    this.node = pickBy(this.node, identity);
+    this.treeSvc.addNode(this.node);
+  };
 }

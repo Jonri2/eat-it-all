@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
-// TODO: is this where I import it?
 import { TreeService } from 'src/app/services/tree.service';
+import { Node } from '../../interfaces/interfaces';
 
 @Component({
   selector: 'app-tree',
@@ -9,7 +8,7 @@ import { TreeService } from 'src/app/services/tree.service';
   styleUrls: ['./tree.component.scss'],
 })
 export class TreeComponent implements OnInit {
-  nodes = [];
+  nodes: Node[] = [];
   treeOptions = {
     allowDrag: true,
     allowDrop: true,
@@ -18,11 +17,11 @@ export class TreeComponent implements OnInit {
     animateAcceleration: 1.3,
   };
 
-  constructor(treeSvc: TreeService) {
-    this.nodes = treeSvc.getNodes()
+  constructor(private treeSvc: TreeService) {
+    treeSvc.getNodes().subscribe((res) => {
+      this.nodes = res.nodes;
+    });
   }
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }
