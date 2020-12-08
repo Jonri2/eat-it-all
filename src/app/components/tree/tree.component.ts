@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Tree } from 'src/app/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 
@@ -9,7 +10,7 @@ import { TreeService } from 'src/app/services/tree.service';
 })
 export class TreeComponent implements OnInit {
   // get handle an tree template variable
-  @ViewChild('myCoolTree') tree: any;
+  @ViewChild('myCoolTree') tree: Tree;
 
   nodes = [];
   treeOptions = {
