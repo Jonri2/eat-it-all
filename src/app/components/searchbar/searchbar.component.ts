@@ -13,6 +13,8 @@ interface SelectedValues {
   styleUrls: ['./searchbar.component.scss'],
 })
 export class SearchbarComponent {
+  listOfFilteredNodes: TreeNode[] = [];
+
   constructor(private sharedDataSvc: SharedTreeDataService) {}
 
   /* will filter the tree and only display nodes that match selected values */
@@ -26,16 +28,37 @@ export class SearchbarComponent {
     searchHasNoContent: boolean,
     selectedValues: string[]
   ) {
+    this.listOfFilteredNodes = [];
     this.sharedDataSvc.tree.treeModel.filterNodes((node: TreeNode) =>
-      searchHasNoContent ? true : fuzzySearch(selectedValues, node.data.name)
+      searchHasNoContent
+        ? true
+        : this._generateListOfFilteredNodes(selectedValues, node)
     );
-    this._collapseTree(searchHasNoContent);
+    this.listOfFilteredNodes.forEach((node: TreeNode) => {
+      node.children.forEach((child: TreeNode) => {
+        child.show();
+        // May need to do this recursively....
+      });
+    });
+    this._shouldCollapseTree(searchHasNoContent);
   }
 
   /* collapse tree if nothing being being search for */
-  private _collapseTree = (searchHasNoContent: boolean) => {
+  private _shouldCollapseTree = (searchHasNoContent: boolean) => {
     if (searchHasNoContent) {
       this.sharedDataSvc.tree.treeModel.collapseAll();
     }
   };
+
+  /* Check if the node searched for exists and make a list.
+    Return: true, if the node exists, false otherwise.
+  */
+  private _generateListOfFilteredNodes(
+    selectedValues: string[],
+    node: TreeNode
+  ) {
+    const nodeExists = fuzzySearch(selectedValues, node.data.name);
+    nodeExists && this.listOfFilteredNodes.push(node);
+    return nodeExists;
+  }
 }
