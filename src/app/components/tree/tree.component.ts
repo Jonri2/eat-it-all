@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Tree } from 'src/app/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
+import { Node } from '../../interfaces/interfaces';
 
 @Component({
   selector: 'app-tree',
@@ -8,10 +10,10 @@ import { TreeService } from 'src/app/services/tree.service';
   styleUrls: ['./tree.component.scss'],
 })
 export class TreeComponent implements OnInit {
+  nodes: Node[] = [];
   // get handle an tree template variable
-  @ViewChild('myCoolTree') tree: any;
+  @ViewChild('myCoolTree') tree: Tree;
 
-  nodes = [];
   treeOptions = {
     allowDrag: true,
     allowDrop: true,
@@ -24,7 +26,9 @@ export class TreeComponent implements OnInit {
     private treeSvc: TreeService,
     private sharedDataSvc: SharedTreeDataService
   ) {
-    this.nodes = this.treeSvc.getNodes();
+    treeSvc.getNodes().subscribe((res) => {
+      this.nodes = res.nodes;
+    });
   }
 
   ngOnInit(): void {}

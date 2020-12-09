@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TreeModel } from '@circlon/angular-tree-component';
-
-interface Tree {
-  treeModel: TreeModel;
-}
+import { Tree } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
