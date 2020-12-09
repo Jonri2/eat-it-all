@@ -7,10 +7,14 @@ interface CustomNodeFields {
   rating?: number;
   date?: Date;
   tags?: string[];
+  children?: Node[];
+  isTag?: boolean;
 }
 
-/* A custom tree node */
-export type Node = Partial<TreeNode> & CustomNodeFields;
+/* A custom tree node
+ref typescript docs: https://www.typescriptlang.org/docs/handbook/utility-types.html
+*/
+export type Node = Partial<Omit<TreeNode, "children">> & CustomNodeFields;
 
 /* type of the tree object displayed on app */
 export interface Tree {

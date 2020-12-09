@@ -22,7 +22,7 @@ export class FoodCounterComponent implements OnInit {
   /* Count number of nodes that don't start with "Tag: " */
   private _recursivelyCountNodes = (nodes: Node[]) => {
     nodes?.forEach((node: Node) => {
-      !node.name.startsWith('Tag: ') && this.count++;
+      !node.isTag && this.count++;
       this._recursivelyCountNodes(node.children);
     });
   };
