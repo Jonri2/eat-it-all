@@ -11,17 +11,10 @@ export class FoodCounterComponent implements OnInit {
   count = 0;
 
   constructor(private treeSvc: TreeService) {
-    // this._recursivelyCountNodes(
-    //   (this.treeSvc.getNodes() as unknown) as PartialTreeNode[]
-    // );
     this.treeSvc.getNodes().subscribe((res) => {
-      // forEach(res.nodes, (node) => {
-      //   this.getNames(node);
-      // });
-      // console.log(res);
-      // this._recursivelyCountNodes(res.nodes)
+      this.count = 0;
+      this._recursivelyCountNodes(res.nodes)
     });
-    // console.log(this.treeSvc.getNodes());
   }
 
   ngOnInit(): void {}

@@ -1,5 +1,6 @@
 import { TreeModel, TreeNode } from '@circlon/angular-tree-component';
 
+/* App specific fields a tree node should carry */
 interface CustomNodeFields {
   name?: string;
   location?: string;
@@ -8,6 +9,7 @@ interface CustomNodeFields {
   tags?: string[];
 }
 
+/* A custom tree node */
 export type Node = Partial<TreeNode> & CustomNodeFields;
 
 /* type of the tree object displayed on app */
