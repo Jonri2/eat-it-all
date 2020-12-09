@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Tree } from '../interfaces';
+import { Tree } from '../interfaces/interfaces';
 
 @Injectable({
   providedIn: 'root',
