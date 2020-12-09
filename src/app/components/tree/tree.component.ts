@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Tree } from 'src/app/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
-import { Node } from '../../interfaces/interfaces';
+import { Node, Tree } from '../../interfaces/interfaces';
 
 @Component({
   selector: 'app-tree',
@@ -26,7 +25,7 @@ export class TreeComponent implements OnInit {
     private treeSvc: TreeService,
     private sharedDataSvc: SharedTreeDataService
   ) {
-    treeSvc.getNodes().subscribe((res) => {
+    this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
     });
   }

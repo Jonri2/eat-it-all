@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
+import { TreeNode } from '@circlon/angular-tree-component';
 
 const userName = 'user1';
 
@@ -29,6 +30,7 @@ export class TreeService {
             { id: 10, name: '🍊 Orange' },
             { id: 11, name: '🍓 Strawberry' },
           ],
+          isTag: true,
         },
         {
           id: 4,
@@ -39,8 +41,10 @@ export class TreeService {
               id: 6,
               name: '🐄 Tag: Cow Related',
               children: [{ id: 7, name: '🍔 Hamburger' }],
+              isTag: true,
             },
           ],
+          isTag: true,
         },
       ],
     });
@@ -71,9 +75,9 @@ export class TreeService {
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
     if (currentNode.name === tag) {
       if (currentNode.children) {
-        currentNode.children.push(nodeToAdd);
+        currentNode.children.push(nodeToAdd as TreeNode);
       } else {
-        currentNode.children = [nodeToAdd];
+        currentNode.children = [nodeToAdd as TreeNode];
       }
       return;
     }
