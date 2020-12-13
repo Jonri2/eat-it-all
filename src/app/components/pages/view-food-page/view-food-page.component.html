@@ -1,1 +1,5 @@
 <p>view-food-page works!</p>
+<button routerLink="/list">Back to list</button>
+<p *ngIf="!isTreeLoading && !isUndefined">{{node?.id}}</p>
+<p *ngIf="!isTreeLoading && isUndefined">Could not find food with id: {{id}}</p>
+<p *ngIf="isTreeLoading">LOADING</p>

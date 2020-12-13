@@ -13,13 +13,16 @@ import { Node, Tree } from '../../interfaces/interfaces';
 })
 export class TreeComponent implements OnInit {
   nodes: Node[] = [];
+  clickedNode: Node;
   // get handle an tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
+  /* Provide custom callbacks */
   actionMapping: IActionMapping = {
     mouse: {
       click: (tree, node, $event) => {
-        this.router.navigateByUrl(`/view/${node.id}`)
+        this.clickedNode = node;
+        this.router.navigateByUrl(`/view/${node.id}`);
       },
     },
   };
@@ -43,9 +46,13 @@ export class TreeComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
-
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.sharedDataSvc.tree = this.tree;
+
+  }
+
+  // ref: https://stackoverflow.com/a/39569933/9931154
+  ngOnDestroy(): void {
+    this.sharedDataSvc.node = this.clickedNode;
   }
 }
