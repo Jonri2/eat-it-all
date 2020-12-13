@@ -1,8 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { IActionMapping } from '@circlon/angular-tree-component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node, Tree } from '../../interfaces/interfaces';
 
+// References: https://stackoverflow.com/a/41427647/9931154
 @Component({
   selector: 'app-tree',
   templateUrl: './tree.component.html',
@@ -13,17 +16,27 @@ export class TreeComponent implements OnInit {
   // get handle an tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
+  actionMapping: IActionMapping = {
+    mouse: {
+      click: (tree, node, $event) => {
+        this.router.navigateByUrl(`/view/${node.id}`)
+      },
+    },
+  };
+
   treeOptions = {
     allowDrag: true,
     allowDrop: true,
     animateExpand: true,
     animateSpeed: 5,
     animateAcceleration: 1.3,
+    actionMapping: this.actionMapping,
   };
 
   constructor(
     private treeSvc: TreeService,
-    private sharedDataSvc: SharedTreeDataService
+    private sharedDataSvc: SharedTreeDataService,
+    private router: Router,
   ) {
     this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
