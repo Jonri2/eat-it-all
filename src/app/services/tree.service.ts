@@ -11,6 +11,7 @@ const userName = 'user1';
 })
 export class TreeService {
   nodes: Node[];
+  isLoading: boolean = true;
 
   constructor(private db: AngularFirestore) {
     this.getNodes().subscribe((res) => {
@@ -51,7 +52,9 @@ export class TreeService {
   }
 
   getUserDoc = () => {
-    return this.db.collection('users').doc<{ nodes: Node[] }>(userName);
+    const userDoc = this.db.collection('users').doc<{ nodes: Node[] }>(userName);
+    this.isLoading = false;
+    return userDoc;
   };
 
   /* Returns an observable of the node tree */

@@ -31,6 +31,9 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { firebaseConfig } from './credentials';
 import { SharedTreeDataService } from './services/shared-tree-data.service';
 import { TreeService } from './services/tree.service';
+import { ListPageComponent } from './components/pages/list-page/list-page.component';
+import { ViewFoodPageComponent } from './components/pages/view-food-page/view-food-page.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -45,10 +48,13 @@ import { TreeService } from './services/tree.service';
     TreeComponent,
     TreeNodeExpanderComponent,
     FoodCounterComponent,
+    ListPageComponent,
+    ViewFoodPageComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    RouterModule,
     BrowserAnimationsModule,
     MatToolbarModule,
     MatButtonModule,
