@@ -78,7 +78,9 @@ export class MultipleAutocompleteComponent {
   /* Runs when the model changes (ngModelChange)
    */
   onChange = () => {
-    this.callback();
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   add = (event: MatChipInputEvent): void => {
@@ -106,7 +108,9 @@ export class MultipleAutocompleteComponent {
       this.selectedValues.splice(index, 1);
     }
     this.values.emit(this.selectedValues);
-    this.callback();
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
