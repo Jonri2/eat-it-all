@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IActionMapping } from '@circlon/angular-tree-component';
+import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node, Tree } from '../../interfaces/interfaces';
@@ -24,6 +24,11 @@ export class TreeComponent implements OnInit {
         this.clickedNode = node;
         this.router.navigateByUrl(`/view/${node.id}`);
       },
+      drop: (tree, node, $event, { from, to }) => {
+        TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
+        console.log(this.nodes);
+        this.treeSvc.setNodes(this.nodes);
+      },
     },
   };
 
@@ -39,7 +44,7 @@ export class TreeComponent implements OnInit {
   constructor(
     private treeSvc: TreeService,
     private sharedDataSvc: SharedTreeDataService,
-    private router: Router,
+    private router: Router
   ) {
     this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
@@ -48,7 +53,6 @@ export class TreeComponent implements OnInit {
 
   ngOnInit(): void {
     this.sharedDataSvc.tree = this.tree;
-
   }
 
   // ref: https://stackoverflow.com/a/39569933/9931154

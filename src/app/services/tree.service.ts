@@ -52,7 +52,9 @@ export class TreeService {
   }
 
   getUserDoc = () => {
-    const userDoc = this.db.collection('users').doc<{ nodes: Node[] }>(userName);
+    const userDoc = this.db
+      .collection('users')
+      .doc<{ nodes: Node[] }>(userName);
     this.isLoading = false;
     return userDoc;
   };
@@ -87,5 +89,26 @@ export class TreeService {
     forEach(currentNode.children, (childNode) => {
       this.searchTree(tag, nodeToAdd, childNode);
     });
+  };
+
+  hasTag = (tag: string, node?: Node): boolean => {
+    if (node) {
+      if (tag === node.name) {
+        return true;
+      }
+      forEach(node.children, (childNode) => {
+        return this.hasTag(tag, childNode);
+      });
+      return false;
+    } else {
+      forEach(this.nodes, (node) => {
+        return this.hasTag(tag, node);
+      });
+    }
+  };
+
+  setNodes = (nodes: Node[]) => {
+    this.nodes = nodes;
+    this.getUserDoc().set({ nodes: this.nodes });
   };
 }
