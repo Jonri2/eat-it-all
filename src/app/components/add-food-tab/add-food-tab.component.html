@@ -6,6 +6,7 @@
   <app-multiple-autocomplete
     placeholder="Tags"
     width="100%"
+    [tagsOnly]="true"
     (values)="onTagsChange($event)"
   ></app-multiple-autocomplete>
   <mat-form-field class="form-field">

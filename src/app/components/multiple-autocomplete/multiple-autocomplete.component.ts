@@ -22,7 +22,7 @@ import {
 } from 'rxjs/operators';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
-import { forEach } from 'lodash';
+import { forEach, filter } from 'lodash';
 
 // https://material.angular.io/components/chips/overview
 // debounce ref: https://stackoverflow.com/questions/41308826/angular-2-debounce-ngmodelchange/52977862#52977862
@@ -44,6 +44,7 @@ export class MultipleAutocompleteComponent {
   @Input() placeholder: string;
   @Input() width: string;
   @Input() callback: () => void;
+  @Input() tagsOnly: boolean;
   @Output() values: EventEmitter<string[]> = new EventEmitter();
 
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
@@ -69,7 +70,13 @@ export class MultipleAutocompleteComponent {
   }
 
   getNames = (node: Node) => {
-    this.allOptions.push(node.name);
+    if (this.tagsOnly) {
+      if (node.isTag) {
+        this.allOptions.push(node.name);
+      }
+    } else {
+      this.allOptions.push(node.name);
+    }
     forEach(node.children, (child) => {
       this.getNames(child);
     });
