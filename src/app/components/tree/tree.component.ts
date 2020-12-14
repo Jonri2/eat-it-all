@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IActionMapping,
@@ -16,7 +16,7 @@ import { Node, Tree } from '../../interfaces/interfaces';
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
 })
-export class TreeComponent implements OnInit {
+export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
   clickedNode: Node;
   // get handle an tree template variable
@@ -57,7 +57,9 @@ export class TreeComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
     this.sharedDataSvc.tree = this.tree;
   }
 
