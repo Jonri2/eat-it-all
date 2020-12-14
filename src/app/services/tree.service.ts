@@ -92,19 +92,25 @@ export class TreeService {
   };
 
   hasTag = (tag: string, node?: Node): boolean => {
+    let tagFound = false;
     if (node) {
       if (tag === node.name) {
         return true;
       }
       forEach(node.children, (childNode) => {
-        return this.hasTag(tag, childNode);
+        if (this.hasTag(tag, childNode)) {
+          tagFound = true;
+        }
       });
-      return false;
+      // Initial Call
     } else {
       forEach(this.nodes, (node) => {
-        return this.hasTag(tag, node);
+        if (this.hasTag(tag, node)) {
+          tagFound = true;
+        }
       });
     }
+    return tagFound;
   };
 
   setNodes = (nodes: Node[]) => {

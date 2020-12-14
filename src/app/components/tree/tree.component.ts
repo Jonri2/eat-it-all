@@ -26,7 +26,6 @@ export class TreeComponent implements OnInit {
       },
       drop: (tree, node, $event, { from, to }) => {
         TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
-        console.log(this.nodes);
         this.treeSvc.setNodes(this.nodes);
       },
     },
