@@ -1,6 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
+import {
+  IActionMapping,
+  TREE_ACTIONS,
+  TreeNode,
+} from '@circlon/angular-tree-component';
+import { map } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node, Tree } from '../../interfaces/interfaces';
@@ -25,8 +30,10 @@ export class TreeComponent implements OnInit {
         this.router.navigateByUrl(`/view/${node.id}`);
       },
       drop: (tree, node, $event, { from, to }) => {
-        TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
-        this.treeSvc.setNodes(this.nodes);
+        if (!map(to.parent.children, 'id').includes(from.data.id)) {
+          TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
+          this.treeSvc.setNodes(this.nodes);
+        }
       },
     },
   };
