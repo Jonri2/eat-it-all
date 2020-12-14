@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
+import { map } from 'lodash';
 
 const userName = 'user1';
 
@@ -71,14 +72,17 @@ export class TreeService {
           this.searchTree(tag, node, topNode);
         });
       });
-    } else {
+    } else if (!this._getNames(this.nodes).includes(node.name)) {
       this.nodes.push(node);
     }
     this.getUserDoc().set({ nodes: this.nodes });
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
-    if (currentNode.name === tag) {
+    if (
+      currentNode.name === tag &&
+      !this._getNames(currentNode.children).includes(nodeToAdd.name)
+    ) {
       if (currentNode.children) {
         currentNode.children.push(nodeToAdd as TreeNode);
       } else {
@@ -116,5 +120,9 @@ export class TreeService {
   setNodes = (nodes: Node[]) => {
     this.nodes = nodes;
     this.getUserDoc().set({ nodes: this.nodes });
+  };
+
+  _getNames = (nodes: Node[]): string[] => {
+    return map(nodes, 'name');
   };
 }
