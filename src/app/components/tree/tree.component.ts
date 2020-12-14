@@ -30,7 +30,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
         this.router.navigateByUrl(`/view/${node.id}`);
       },
       drop: (tree, node, $event, { from, to }) => {
-        if (!map(to.parent.children, 'id').includes(from.data.id)) {
+        if (
+          !map(to.parent.children, 'id').includes(from.data.id) &&
+          to.parent.data.isTag
+        ) {
           TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
           this.treeSvc.setNodes(this.nodes);
         }
