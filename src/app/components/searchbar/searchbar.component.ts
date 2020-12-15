@@ -45,21 +45,26 @@ export class SearchbarComponent {
   ) {
     this.listOfFilteredNodes = [];
     this.sharedDataSvc.getTree().treeModel.filterNodes((node: TreeNode) => {
-      let filterBool = true;
+      let showNode = true;
+      // If only the Tag checkbox is selected, hide the food nodes
       if (this.tags && !this.food) {
-        filterBool = node.data.isTag;
+        showNode = node.data.isTag;
+        // If only the Food checkbox is selected, add the food nodes to the filtered nodes list
       } else if (this.food && !this.tags) {
-        filterBool = !node.data.isTag;
-        if (filterBool) {
+        if (!node.data.isTag) {
           this._generateListOfFilteredNodes(selectedValues, node);
         }
       }
+      // If there is no search, don't filter the list
+      // If there is, check if the node is found in the search. Filter it out if it is not
       return (
-        filterBool &&
+        showNode &&
         (searchHasNoContent ||
           this._generateListOfFilteredNodes(selectedValues, node))
       );
     });
+    // Switch the tree to food items if the Food checkbox is set
+    // Only works when there is no search
     if (this.food && !this.tags && searchHasNoContent) {
       const tree: Tree = this.sharedDataSvc.getTree();
       tree.treeModel.nodes = this.listOfFilteredNodes;
