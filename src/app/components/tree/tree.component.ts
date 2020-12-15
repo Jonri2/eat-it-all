@@ -28,7 +28,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
       drop: (tree, node, $event, { from, to }) => {
         if (
           !map(to.parent.children, 'id').includes(from.data.id) &&
-          to.parent.data.isTag
+          (to.parent.data.isTag || !to.parent.parent)
         ) {
           TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
           this.treeSvc.setNodes(this.nodes);
