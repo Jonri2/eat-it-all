@@ -84,15 +84,7 @@ export class SearchbarComponent {
         this._recursivelyShowChildren(node);
       });
     }
-    this._shouldCollapseTree(searchHasNoContent);
   }
-
-  /* collapse tree if nothing being being search for */
-  private _shouldCollapseTree = (searchHasNoContent: boolean) => {
-    if (searchHasNoContent) {
-      this.sharedDataSvc.getTree().treeModel.collapseAll();
-    }
-  };
 
   /* show all children for a node, recursively.
     The base case is handled by node.children?
