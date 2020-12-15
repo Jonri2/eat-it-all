@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { TreeService } from 'src/app/services/tree.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,11 @@ export class LoginPageComponent implements OnInit {
   isError: boolean = false;
   errorMessage: string;
 
-  constructor(private authSvc: AuthService, public router: Router) {}
+  constructor(
+    private authSvc: AuthService,
+    public router: Router,
+    private treeSvc: TreeService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -32,6 +37,7 @@ export class LoginPageComponent implements OnInit {
     this.isError = false;
     try {
       await this.authSvc.signupUser(this.email, this.password);
+      this.treeSvc.setUserDoc(this.email);
       this.router.navigateByUrl('list');
     } catch (error) {
       this.isError = true;

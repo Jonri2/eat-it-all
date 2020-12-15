@@ -3,8 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-
-const userName = 'user1';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +11,12 @@ const userName = 'user1';
 export class TreeService {
   nodes: Node[];
   isLoading: boolean = true;
+  userEmail: string;
 
-  constructor(private db: AngularFirestore) {
+  constructor(private db: AngularFirestore, private authSvc: AuthService) {
+    this.authSvc.getCurrentUser().then((email) => {
+      this.userEmail = email;
+    });
     this.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
     });
@@ -52,9 +55,15 @@ export class TreeService {
   }
 
   getUserDoc = () => {
-    const userDoc = this.db.collection('users').doc<{ nodes: Node[] }>(userName);
+    const userDoc = this.db
+      .collection('users')
+      .doc<{ nodes: Node[] }>(this.userEmail);
     this.isLoading = false;
     return userDoc;
+  };
+
+  setUserDoc = (email: string) => {
+    this.db.collection('users').doc(email).set({ nodes: [] });
   };
 
   /* Returns an observable of the node tree */
