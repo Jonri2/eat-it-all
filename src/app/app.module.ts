@@ -28,12 +28,14 @@ import { TreeNodeExpanderComponent } from './components/tree-node-expander/tree-
 import { FoodCounterComponent } from './components/food-counter/food-counter.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 import { firebaseConfig } from './credentials';
 import { SharedTreeDataService } from './services/shared-tree-data.service';
 import { TreeService } from './services/tree.service';
 import { ListPageComponent } from './components/pages/list-page/list-page.component';
 import { ViewFoodPageComponent } from './components/pages/view-food-page/view-food-page.component';
 import { RouterModule } from '@angular/router';
+import { LoginPageComponent } from './components/pages/login/login.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +52,7 @@ import { RouterModule } from '@angular/router';
     FoodCounterComponent,
     ListPageComponent,
     ViewFoodPageComponent,
+    LoginPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -72,6 +75,7 @@ import { RouterModule } from '@angular/router';
     TreeModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
+    AngularFireAuthModule,
   ],
   providers: [SharedTreeDataService, TreeService],
   bootstrap: [AppComponent],

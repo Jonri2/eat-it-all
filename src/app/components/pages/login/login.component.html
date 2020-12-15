@@ -1,0 +1,36 @@
+<form #f="ngForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="login-field">
+    <mat-label>Email</mat-label>
+    <input matInput [(ngModel)]="email" required name="email" />
+  </mat-form-field>
+  <mat-form-field class="login-field">
+    <mat-label>Password</mat-label>
+    <input
+      matInput
+      type="password"
+      [(ngModel)]="password"
+      required
+      name="password"
+    />
+  </mat-form-field>
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    [disabled]="!f.valid"
+    class="login-field"
+  >
+    Login
+  </button>
+  <button
+    mat-raised-button
+    color="accent"
+    [disabled]="!f.valid"
+    (click)="createAccount()"
+    class="login-field"
+  >
+    Create Account
+  </button>
+  <a (click)="resetPassword()" class="login-field">Forgot Password?</a>
+  <p *ngIf="isError" class="error">{{ errorMessage }}</p>
+</form>
