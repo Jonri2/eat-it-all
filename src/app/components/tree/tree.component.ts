@@ -52,11 +52,13 @@ export class TreeComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {
     this.treeSvc.getNodes().subscribe((res) => {
+      console.log(res.nodes);
       this.nodes = res.nodes;
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
       const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
       if (nodes.length > 0 && !nodes.includes(undefined)) {
+        console.log(nodes);
         this.nodes = nodes;
       } else {
         this.nodes = tree.treeModel?.nodes;

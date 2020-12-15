@@ -5,6 +5,7 @@ import { Tree } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
+import { map } from 'lodash';
 
 interface SelectedValues {
   selectedValues: string[];
@@ -23,7 +24,11 @@ export class SearchbarComponent {
   constructor(
     private sharedDataSvc: SharedTreeDataService,
     private treeSvc: TreeService
-  ) {}
+  ) {
+    this.treeSvc.nodeAdded.subscribe(() => {
+      this.filterTree({ selectedValues: [] })();
+    });
+  }
 
   /* will filter the tree and only display nodes that match selected values */
   filterTree = ({ selectedValues }: SelectedValues) => () => {
@@ -101,7 +106,9 @@ export class SearchbarComponent {
     node: TreeNode
   ): boolean {
     const nodeExists = fuzzySearch(selectedValues, node.data.name);
+    const ids = map(this.listOfFilteredNodes, 'id');
     (!selectedValues.length || nodeExists) &&
+      !ids.includes(node.data.id) &&
       this.listOfFilteredNodes.push(node);
     return nodeExists;
   }
