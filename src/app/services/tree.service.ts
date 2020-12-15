@@ -14,6 +14,8 @@ export class TreeService {
   isLoading: boolean = true;
   private nodeAddedSubject = new Subject();
   nodeAdded = this.nodeAddedSubject.asObservable();
+  private filterSubject = new Subject<Node[]>();
+  filter = this.filterSubject.asObservable();
   userEmail: string;
 
   constructor(private db: AngularFirestore) {
@@ -140,6 +142,10 @@ export class TreeService {
 
   nodeAddedCallback = () => {
     this.nodeAddedSubject.next();
+  };
+
+  filterCallback = (nodes: Node[]) => {
+    this.filterSubject.next(nodes);
   };
 
   _getNames = (nodes: Node[]): string[] => {

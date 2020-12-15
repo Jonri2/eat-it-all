@@ -34,6 +34,11 @@ export class SearchbarComponent {
   filterTree = ({ selectedValues }: SelectedValues) => () => {
     const searchHasContent = selectedValues.length === 0;
     this._updateTreeNodes(searchHasContent, selectedValues);
+    if (searchHasContent) {
+      this.treeSvc.filterCallback(this.treeSvc.getLocalNodes());
+    } else if (this.listOfFilteredNodes.length) {
+      this.treeSvc.filterCallback(this.listOfFilteredNodes);
+    }
   };
 
   onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
