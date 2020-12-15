@@ -82,19 +82,11 @@ export class MultipleAutocompleteComponent {
     });
   };
 
-  /* Runs when the model changes (ngModelChange)
-   */
-  onChange = () => {
-    if (this.callback) {
-      this.callback();
-    }
-  };
-
   add = (event: MatChipInputEvent): void => {
     const input = event.input;
     const value = event.value;
 
-    // Add our fruit
+    // Add our value
     if ((value || '').trim()) {
       this.selectedValues.push(value.trim());
     }
@@ -106,6 +98,7 @@ export class MultipleAutocompleteComponent {
 
     this.searchCtrl.setValue(null);
     this.values.emit(this.selectedValues);
+    this.invokeCallback();
   };
 
   remove = (value: string): void => {
@@ -115,9 +108,7 @@ export class MultipleAutocompleteComponent {
       this.selectedValues.splice(index, 1);
     }
     this.values.emit(this.selectedValues);
-    if (this.callback) {
-      this.callback();
-    }
+    this.invokeCallback();
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
@@ -125,6 +116,13 @@ export class MultipleAutocompleteComponent {
     this.searchInput.nativeElement.value = '';
     this.searchCtrl.setValue(null);
     this.values.emit(this.selectedValues);
+    this.invokeCallback();
+  };
+
+  invokeCallback = () => {
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   clearSelections = () => {

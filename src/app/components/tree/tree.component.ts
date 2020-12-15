@@ -67,7 +67,6 @@ export class TreeComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.sharedDataSvc.setTree(this.tree);
-    this.tree.treeModel.collapseAll();
   }
 
   // ref: https://stackoverflow.com/a/39569933/9931154

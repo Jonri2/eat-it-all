@@ -34,6 +34,8 @@ export class SearchbarComponent {
   filterTree = ({ selectedValues }: SelectedValues) => () => {
     const searchHasContent = selectedValues.length === 0;
     this._updateTreeNodes(searchHasContent, selectedValues);
+
+    // Update counter based on search
     if (searchHasContent) {
       this.treeSvc.filterCallback(this.treeSvc.getLocalNodes());
     } else if (this.listOfFilteredNodes.length) {

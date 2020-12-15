@@ -4,19 +4,21 @@
 <tree-root #myCoolTree [nodes]="nodes" [options]="treeOptions" class="tree">
   <ng-template #treeNodeWrapperTemplate let-node let-index="index">
     <div class="node-wrapper" [style.padding-left]="node.getNodePadding()">
-      <app-tree-node-expander [node]=node></app-tree-node-expander>
+      <app-tree-node-expander [node]="node"></app-tree-node-expander>
 
-      <div class="node-content-wrapper"
+      <div
+        class="node-content-wrapper"
         [class.node-content-wrapper-active]="node.isActive"
         [class.node-content-wrapper-focused]="node.isFocused"
         (click)="node.mouseAction('click', $event)"
         (dblclick)="node.mouseAction('dblClick', $event)"
         (contextmenu)="node.mouseAction('contextMenu', $event)"
         (treeDrop)="node.onDrop($event)"
+        (initialized)="onInitialized(myCoolTree)"
         [treeAllowDrop]="node.allowDrop"
         [treeDrag]="node"
-        [treeDragEnabled]="node.allowDrag()">
-
+        [treeDragEnabled]="node.allowDrag()"
+      >
         <!-- Update this is you want to override what each node is displayed as -->
         <tree-node-content [node]="node" [index]="index"></tree-node-content>
       </div>
