@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IActionMapping } from '@circlon/angular-tree-component';
+import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
+import { map } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node, Tree } from '../../interfaces/interfaces';
@@ -11,10 +12,10 @@ import { Node, Tree } from '../../interfaces/interfaces';
   templateUrl: './tree.component.html',
   styleUrls: ['./tree.component.scss'],
 })
-export class TreeComponent implements OnInit {
+export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
   clickedNode: Node;
-  // get handle an tree template variable
+  // get handle on tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
   /* Provide custom callbacks */
@@ -23,6 +24,15 @@ export class TreeComponent implements OnInit {
       click: (tree, node, $event) => {
         this.clickedNode = node;
         this.router.navigateByUrl(`/view/${node.id}`);
+      },
+      drop: (tree, node, $event, { from, to }) => {
+        if (
+          !map(to.parent.children, 'id').includes(from.data.id) &&
+          to.parent.data.isTag
+        ) {
+          TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
+          this.treeSvc.setNodes(this.nodes);
+        }
       },
     },
   };
@@ -39,16 +49,25 @@ export class TreeComponent implements OnInit {
   constructor(
     private treeSvc: TreeService,
     private sharedDataSvc: SharedTreeDataService,
-    private router: Router,
+    private router: Router
   ) {
     this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
     });
+    this.sharedDataSvc.tree.subscribe((tree: Tree) => {
+      const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
+      if (nodes.length > 0 && !nodes.includes(undefined)) {
+        this.nodes = nodes;
+      } else {
+        this.nodes = tree.treeModel?.nodes;
+      }
+    });
   }
 
-  ngOnInit(): void {
-    this.sharedDataSvc.tree = this.tree;
+  ngOnInit(): void {}
 
+  ngAfterViewInit(): void {
+    this.sharedDataSvc.setTree(this.tree);
   }
 
   // ref: https://stackoverflow.com/a/39569933/9931154

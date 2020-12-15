@@ -15,6 +15,16 @@ body {
   overflow: hidden !important;
 }
 
+div.mat-chip-list-wrapper {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
 button:focus {
   outline: none !important;
+}
+
+.form {
+  padding-left: 0.5vw;
 }

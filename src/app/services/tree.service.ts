@@ -3,17 +3,21 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { AuthService } from './auth.service';
+import { map } from 'lodash';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TreeService {
-  nodes: Node[] = [];
+  private _nodes: Node[];
   isLoading: boolean = true;
   userEmail: string;
 
-  constructor(private db: AngularFirestore) {}
+  constructor(private db: AngularFirestore) {
+    this.getNodes().subscribe((res) => {
+      this._nodes = res.nodes;
+    });
+  }
 
   getUserDoc = () => {
     const userDoc = this.db
@@ -35,18 +39,21 @@ export class TreeService {
   addNode = (node: Node) => {
     if (node.tags && node.tags.length) {
       forEach(node.tags, (tag) => {
-        forEach(this.nodes, (topNode) => {
+        forEach(this._nodes, (topNode) => {
           this.searchTree(tag, node, topNode);
         });
       });
-    } else {
-      this.nodes.push(node);
+    } else if (!this._getNames(this._nodes).includes(node.name)) {
+      this._nodes.push(node);
     }
-    this.getUserDoc().set({ nodes: this.nodes });
+    this.getUserDoc().set({ nodes: this._nodes });
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
-    if (currentNode.name === tag) {
+    if (
+      currentNode.name === tag &&
+      !this._getNames(currentNode.children).includes(nodeToAdd.name)
+    ) {
       if (currentNode.children) {
         currentNode.children.push(nodeToAdd as TreeNode);
       } else {
@@ -62,7 +69,7 @@ export class TreeService {
   onLogin = (email: string) => {
     this.userEmail = email;
     this.getNodes().subscribe((res) => {
-      this.nodes = res.nodes;
+      this._nodes = res.nodes;
     });
     // Run this to reset the db
     // this.getUserDoc().set({
@@ -95,5 +102,40 @@ export class TreeService {
     //     },
     //   ],
     // });
+  };
+
+  hasTag = (tag: string, node?: Node): boolean => {
+    let tagFound = false;
+    if (node) {
+      if (tag === node.name) {
+        return true;
+      }
+      forEach(node.children, (childNode) => {
+        if (this.hasTag(tag, childNode)) {
+          tagFound = true;
+        }
+      });
+      // Initial Call
+    } else {
+      forEach(this._nodes, (node) => {
+        if (this.hasTag(tag, node)) {
+          tagFound = true;
+        }
+      });
+    }
+    return tagFound;
+  };
+
+  setNodes = (nodes: Node[]) => {
+    this._nodes = nodes;
+    this.getUserDoc().set({ nodes: this._nodes });
+  };
+
+  getLocalNodes = () => {
+    return this._nodes;
+  };
+
+  _getNames = (nodes: Node[]): string[] => {
+    return map(nodes, 'name');
   };
 }

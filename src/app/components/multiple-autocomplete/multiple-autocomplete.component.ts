@@ -44,6 +44,7 @@ export class MultipleAutocompleteComponent {
   @Input() placeholder: string;
   @Input() width: string;
   @Input() callback: () => void;
+  @Input() tagsOnly: boolean;
   @Output() values: EventEmitter<string[]> = new EventEmitter();
 
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>;
@@ -69,7 +70,13 @@ export class MultipleAutocompleteComponent {
   }
 
   getNames = (node: Node) => {
-    this.allOptions.push(node.name);
+    if (this.tagsOnly) {
+      if (node.isTag) {
+        this.allOptions.push(node.name);
+      }
+    } else {
+      this.allOptions.push(node.name);
+    }
     forEach(node.children, (child) => {
       this.getNames(child);
     });
@@ -78,7 +85,9 @@ export class MultipleAutocompleteComponent {
   /* Runs when the model changes (ngModelChange)
    */
   onChange = () => {
-    this.callback();
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   add = (event: MatChipInputEvent): void => {
@@ -106,7 +115,9 @@ export class MultipleAutocompleteComponent {
       this.selectedValues.splice(index, 1);
     }
     this.values.emit(this.selectedValues);
-    this.callback();
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
