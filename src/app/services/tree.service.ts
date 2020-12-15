@@ -10,7 +10,7 @@ import { Subject } from 'rxjs/internal/Subject';
   providedIn: 'root',
 })
 export class TreeService {
-  private _nodes: Node[];
+  private _nodes: Node[] = [];
   isLoading: boolean = true;
   private nodeAddedSubject = new Subject();
   nodeAdded = this.nodeAddedSubject.asObservable();
@@ -18,7 +18,7 @@ export class TreeService {
 
   constructor(private db: AngularFirestore) {
     this.getNodes().subscribe((res) => {
-      this._nodes = res.nodes;
+      this._nodes = res?.nodes;
     });
   }
 
@@ -75,36 +75,36 @@ export class TreeService {
       this._nodes = res.nodes;
     });
     // Run this to reset the db
-    // this.getUserDoc().set({
-    //   nodes: [
-    //     {
-    //       id: 1,
-    //       name: 'Tag: Fruit',
-    //       children: [
-    //         { id: 2, name: '🍎 Apple' },
-    //         { id: 8, name: '🍋 Lemon' },
-    //         { id: 9, name: '🍋🟩 Lime' },
-    //         { id: 10, name: '🍊 Orange' },
-    //         { id: 11, name: '🍓 Strawberry' },
-    //       ],
-    //       isTag: true,
-    //     },
-    //     {
-    //       id: 4,
-    //       name: 'Tag: Meat',
-    //       children: [
-    //         { id: 5, name: '🐔 Cooked Chicken' },
-    //         {
-    //           id: 6,
-    //           name: '🐄 Tag: Cow Related',
-    //           children: [{ id: 7, name: '🍔 Hamburger' }],
-    //           isTag: true,
-    //         },
-    //       ],
-    //       isTag: true,
-    //     },
-    //   ],
-    // });
+    this.getUserDoc().set({
+      nodes: [
+        {
+          id: 1,
+          name: 'Fruit',
+          children: [
+            { id: 2, name: '🍎 Apple' },
+            { id: 8, name: '🍋 Lemon' },
+            { id: 9, name: '🍋🟩 Lime' },
+            { id: 10, name: '🍊 Orange' },
+            { id: 11, name: '🍓 Strawberry' },
+          ],
+          isTag: true,
+        },
+        {
+          id: 4,
+          name: 'Meat',
+          children: [
+            { id: 5, name: '🐔 Cooked Chicken' },
+            {
+              id: 6,
+              name: '🐄 Cow Related',
+              children: [{ id: 7, name: '🍔 Hamburger' }],
+              isTag: true,
+            },
+          ],
+          isTag: true,
+        },
+      ],
+    });
   };
 
   hasTag = (tag: string, node?: Node): boolean => {
