@@ -21,7 +21,11 @@ export class AddFoodTabComponent {
   @ViewChild(MultipleAutocompleteComponent)
   tagsComponent: MultipleAutocompleteComponent;
 
-  constructor(private treeSvc: TreeService) {}
+  constructor(private treeSvc: TreeService) {
+    this.treeSvc.getNodes().subscribe((res) => {
+      this.treeSvc.nodeAddedCallback();
+    });
+  }
 
   onRateChange = (rating: number) => {
     this.currentRate = rating;

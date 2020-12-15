@@ -56,11 +56,10 @@ export class TreeComponent implements OnInit, AfterViewInit {
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
       const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
-      if (nodes.length > 0 && !nodes.includes(undefined)) {
-        this.nodes = nodes;
-      } else {
-        this.nodes = tree.treeModel?.nodes;
-      }
+      this.nodes =
+        nodes.length > 0 && !nodes.includes(undefined)
+          ? nodes
+          : tree.treeModel?.nodes;
     });
   }
 

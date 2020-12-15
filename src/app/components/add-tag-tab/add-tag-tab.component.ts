@@ -27,7 +27,6 @@ export class AddTagTabComponent {
   onSubmit = () => {
     this.node.id = v4();
     this.treeSvc.addNode(this.node);
-    console.log(this.node.tags);
     this.node = {
       name: '',
     };

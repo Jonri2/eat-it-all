@@ -4,6 +4,7 @@ import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
 import { map } from 'lodash';
+import { Subject } from 'rxjs/internal/Subject';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,8 @@ import { map } from 'lodash';
 export class TreeService {
   private _nodes: Node[];
   isLoading: boolean = true;
+  private nodeAddedSubject = new Subject();
+  nodeAdded = this.nodeAddedSubject.asObservable();
   userEmail: string;
 
   constructor(private db: AngularFirestore) {
@@ -133,6 +136,10 @@ export class TreeService {
 
   getLocalNodes = () => {
     return this._nodes;
+  };
+
+  nodeAddedCallback = () => {
+    this.nodeAddedSubject.next();
   };
 
   _getNames = (nodes: Node[]): string[] => {
