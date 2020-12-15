@@ -11,12 +11,12 @@ const userName = 'user1';
   providedIn: 'root',
 })
 export class TreeService {
-  nodes: Node[];
+  private _nodes: Node[];
   isLoading: boolean = true;
 
   constructor(private db: AngularFirestore) {
     this.getNodes().subscribe((res) => {
-      this.nodes = res.nodes;
+      this._nodes = res.nodes;
     });
 
     // Run this to reset the db
@@ -68,14 +68,14 @@ export class TreeService {
   addNode = (node: Node) => {
     if (node.tags && node.tags.length) {
       forEach(node.tags, (tag) => {
-        forEach(this.nodes, (topNode) => {
+        forEach(this._nodes, (topNode) => {
           this.searchTree(tag, node, topNode);
         });
       });
-    } else if (!this._getNames(this.nodes).includes(node.name)) {
-      this.nodes.push(node);
+    } else if (!this._getNames(this._nodes).includes(node.name)) {
+      this._nodes.push(node);
     }
-    this.getUserDoc().set({ nodes: this.nodes });
+    this.getUserDoc().set({ nodes: this._nodes });
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
@@ -108,7 +108,7 @@ export class TreeService {
       });
       // Initial Call
     } else {
-      forEach(this.nodes, (node) => {
+      forEach(this._nodes, (node) => {
         if (this.hasTag(tag, node)) {
           tagFound = true;
         }
@@ -118,8 +118,12 @@ export class TreeService {
   };
 
   setNodes = (nodes: Node[]) => {
-    this.nodes = nodes;
-    this.getUserDoc().set({ nodes: this.nodes });
+    this._nodes = nodes;
+    this.getUserDoc().set({ nodes: this._nodes });
+  };
+
+  getLocalNodes = () => {
+    return this._nodes;
   };
 
   _getNames = (nodes: Node[]): string[] => {

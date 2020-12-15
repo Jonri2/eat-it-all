@@ -1,10 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  IActionMapping,
-  TREE_ACTIONS,
-  TreeNode,
-} from '@circlon/angular-tree-component';
+import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
 import { map } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
@@ -19,7 +15,7 @@ import { Node, Tree } from '../../interfaces/interfaces';
 export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
   clickedNode: Node;
-  // get handle an tree template variable
+  // get handle on tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
   /* Provide custom callbacks */
@@ -58,12 +54,20 @@ export class TreeComponent implements OnInit, AfterViewInit {
     this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
     });
+    this.sharedDataSvc.tree.subscribe((tree: Tree) => {
+      const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
+      if (nodes.length > 0 && !nodes.includes(undefined)) {
+        this.nodes = nodes;
+      } else {
+        this.nodes = tree.treeModel?.nodes;
+      }
+    });
   }
 
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    this.sharedDataSvc.tree = this.tree;
+    this.sharedDataSvc.setTree(this.tree);
   }
 
   // ref: https://stackoverflow.com/a/39569933/9931154

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Node, Tree } from '../interfaces/interfaces';
 
 @Injectable({
@@ -7,19 +8,20 @@ import { Node, Tree } from '../interfaces/interfaces';
 export class SharedTreeDataService {
   constructor() {}
 
-  private _tree: Tree;
+  private treeSubject = new BehaviorSubject<Tree>({ treeModel: undefined });
+  tree = this.treeSubject.asObservable();
   private _node: Node;
 
-  set tree(tree: Tree) {
-    this._tree = tree;
+  setTree(tree: Tree) {
+    this.treeSubject.next(tree);
   }
 
-  get tree() {
-    return this._tree;
+  getTree() {
+    return this.treeSubject.getValue();
   }
 
   set node(node: Node) {
-    this._node = node
+    this._node = node;
   }
 
   get node() {

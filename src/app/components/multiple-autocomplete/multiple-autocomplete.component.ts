@@ -22,7 +22,7 @@ import {
 } from 'rxjs/operators';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
-import { forEach, filter } from 'lodash';
+import { forEach } from 'lodash';
 
 // https://material.angular.io/components/chips/overview
 // debounce ref: https://stackoverflow.com/questions/41308826/angular-2-debounce-ngmodelchange/52977862#52977862
