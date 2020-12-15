@@ -21,6 +21,6 @@ export class AuthService {
   }
   async getCurrentUser(): Promise<string> {
     const user = await this.afAuth.currentUser;
-    return user.email;
+    return user ? user.email : null;
   }
 }

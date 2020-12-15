@@ -26,6 +26,7 @@ export class LoginPageComponent implements OnInit {
     this.isError = false;
     try {
       await this.authSvc.loginUser(this.email, this.password);
+      this.treeSvc.onLogin(this.email);
       this.router.navigateByUrl('list');
     } catch (error) {
       this.isError = true;
@@ -38,6 +39,7 @@ export class LoginPageComponent implements OnInit {
     try {
       await this.authSvc.signupUser(this.email, this.password);
       this.treeSvc.setUserDoc(this.email);
+      this.treeSvc.onLogin(this.email);
       this.router.navigateByUrl('list');
     } catch (error) {
       this.isError = true;
