@@ -1,10 +1,14 @@
-<mat-form-field class="form-field">
-  <mat-label>Name</mat-label>
-  <input matInput />
-</mat-form-field>
-<app-multiple-autocomplete
-  placeholder="Parent Tags"
-  width="100%"
-  [separatorKeysCodes]="[]"
-></app-multiple-autocomplete>
-<button mat-raised-button color="primary">Submit</button>
+<form #f="ngForm" (ngSubmit)="onSubmit()" class="form">
+  <mat-form-field class="form-field">
+    <mat-label>Name</mat-label>
+    <input matInput [(ngModel)]="node.name" required name="name" />
+  </mat-form-field>
+  <app-multiple-autocomplete
+    placeholder="Parent Tags"
+    width="100%"
+    [separatorKeysCodes]="[]"
+    [tagsOnly]="true"
+    (values)="onTagsChange($event)"
+  ></app-multiple-autocomplete>
+  <button mat-raised-button color="primary" type="submit">Submit</button>
+</form>

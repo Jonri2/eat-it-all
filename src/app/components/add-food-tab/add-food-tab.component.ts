@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { TreeService } from 'src/app/services/tree.service';
-import { Node } from '../../interfaces/interfaces';
-import { pickBy, identity } from 'lodash';
+import { Node } from 'src/app/interfaces/interfaces';
+import { pickBy, identity, forEach } from 'lodash';
 import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 
@@ -12,7 +12,6 @@ import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple
 })
 export class AddFoodTabComponent {
   node: Node = {
-    id: '',
     name: '',
     location: undefined,
     date: undefined,
@@ -37,9 +36,16 @@ export class AddFoodTabComponent {
     this.node.rating = this.currentRate;
     // Remove all falsy values
     this.node = pickBy(this.node, identity);
+
+    // Add tags that haven't already been added
+    forEach(this.node.tags, (tag) => {
+      if (!this.treeSvc.hasTag(tag)) {
+        this.treeSvc.addNode({ id: v4(), name: tag, isTag: true });
+      }
+    });
+
     this.treeSvc.addNode(this.node);
     this.node = {
-      id: '',
       name: '',
       location: undefined,
       date: undefined,

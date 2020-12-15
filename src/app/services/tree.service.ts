@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
+import { map } from 'lodash';
 
 const userName = 'user1';
 
@@ -52,7 +53,9 @@ export class TreeService {
   }
 
   getUserDoc = () => {
-    const userDoc = this.db.collection('users').doc<{ nodes: Node[] }>(userName);
+    const userDoc = this.db
+      .collection('users')
+      .doc<{ nodes: Node[] }>(userName);
     this.isLoading = false;
     return userDoc;
   };
@@ -69,14 +72,17 @@ export class TreeService {
           this.searchTree(tag, node, topNode);
         });
       });
-    } else {
+    } else if (!this._getNames(this.nodes).includes(node.name)) {
       this.nodes.push(node);
     }
     this.getUserDoc().set({ nodes: this.nodes });
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
-    if (currentNode.name === tag) {
+    if (
+      currentNode.name === tag &&
+      !this._getNames(currentNode.children).includes(nodeToAdd.name)
+    ) {
       if (currentNode.children) {
         currentNode.children.push(nodeToAdd as TreeNode);
       } else {
@@ -87,5 +93,36 @@ export class TreeService {
     forEach(currentNode.children, (childNode) => {
       this.searchTree(tag, nodeToAdd, childNode);
     });
+  };
+
+  hasTag = (tag: string, node?: Node): boolean => {
+    let tagFound = false;
+    if (node) {
+      if (tag === node.name) {
+        return true;
+      }
+      forEach(node.children, (childNode) => {
+        if (this.hasTag(tag, childNode)) {
+          tagFound = true;
+        }
+      });
+      // Initial Call
+    } else {
+      forEach(this.nodes, (node) => {
+        if (this.hasTag(tag, node)) {
+          tagFound = true;
+        }
+      });
+    }
+    return tagFound;
+  };
+
+  setNodes = (nodes: Node[]) => {
+    this.nodes = nodes;
+    this.getUserDoc().set({ nodes: this.nodes });
+  };
+
+  _getNames = (nodes: Node[]): string[] => {
+    return map(nodes, 'name');
   };
 }

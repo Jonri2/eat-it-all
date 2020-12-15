@@ -13,17 +13,20 @@ export class FoodCounterComponent implements OnInit {
   constructor(private treeSvc: TreeService) {
     this.treeSvc.getNodes().subscribe((res) => {
       this.count = 0;
-      this._recursivelyCountNodes(res.nodes)
+      this._recursivelyCountNodes(res.nodes, []);
     });
   }
 
   ngOnInit(): void {}
 
-  /* Count number of nodes that don't start with "Tag: " */
-  private _recursivelyCountNodes = (nodes: Node[]) => {
+  /* Count number of nodes that aren't tags */
+  private _recursivelyCountNodes = (nodes: Node[], ids: Node['id'][]) => {
     nodes?.forEach((node: Node) => {
-      !node.isTag && this.count++;
-      this._recursivelyCountNodes(node.children);
+      if (!node.isTag && !ids.includes(node.id)) {
+        ids.push(node.id);
+        this.count++;
+      }
+      this._recursivelyCountNodes(node.children, ids);
     });
   };
 }
