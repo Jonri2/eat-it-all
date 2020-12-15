@@ -79,10 +79,11 @@ export class SearchbarComponent {
       const tree: Tree = this.sharedDataSvc.getTree();
       tree.treeModel.nodes = this.listOfFilteredNodes;
       this.sharedDataSvc.setTree(tree);
+    } else if (!this.tags || this.food) {
+      this.listOfFilteredNodes.forEach((node: TreeNode) => {
+        this._recursivelyShowChildren(node);
+      });
     }
-    this.listOfFilteredNodes.forEach((node: TreeNode) => {
-      this._recursivelyShowChildren(node);
-    });
     this._shouldCollapseTree(searchHasNoContent);
   }
 
