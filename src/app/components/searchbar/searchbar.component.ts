@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TreeNode } from '@circlon/angular-tree-component';
+import { Tree } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
+import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
 
 interface SelectedValues {
@@ -14,13 +17,25 @@ interface SelectedValues {
 })
 export class SearchbarComponent {
   listOfFilteredNodes: TreeNode[] = [];
+  @Input() food: boolean = true;
+  @Input() tags: boolean = true;
 
-  constructor(private sharedDataSvc: SharedTreeDataService) {}
+  constructor(
+    private sharedDataSvc: SharedTreeDataService,
+    private treeSvc: TreeService
+  ) {}
 
   /* will filter the tree and only display nodes that match selected values */
   filterTree = ({ selectedValues }: SelectedValues) => () => {
     const searchHasContent = selectedValues.length === 0;
     this._updateTreeNodes(searchHasContent, selectedValues);
+  };
+
+  onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
+    const tree: Tree = this.sharedDataSvc.getTree();
+    tree.treeModel.nodes = this.treeSvc.getLocalNodes();
+    this.sharedDataSvc.setTree(tree);
+    this.filterTree(values)();
   };
 
   /* Dynamically update nodes that are being shown */
@@ -29,11 +44,27 @@ export class SearchbarComponent {
     selectedValues: string[]
   ) {
     this.listOfFilteredNodes = [];
-    this.sharedDataSvc.tree.treeModel.filterNodes((node: TreeNode) =>
-      searchHasNoContent
-        ? true
-        : this._generateListOfFilteredNodes(selectedValues, node)
-    );
+    this.sharedDataSvc.getTree().treeModel.filterNodes((node: TreeNode) => {
+      let filterBool = true;
+      if (this.tags && !this.food) {
+        filterBool = node.data.isTag;
+      } else if (this.food && !this.tags) {
+        filterBool = !node.data.isTag;
+        if (filterBool) {
+          this._generateListOfFilteredNodes(selectedValues, node);
+        }
+      }
+      return (
+        filterBool &&
+        (searchHasNoContent ||
+          this._generateListOfFilteredNodes(selectedValues, node))
+      );
+    });
+    if (this.food && !this.tags && searchHasNoContent) {
+      const tree: Tree = this.sharedDataSvc.getTree();
+      tree.treeModel.nodes = this.listOfFilteredNodes;
+      this.sharedDataSvc.setTree(tree);
+    }
     this.listOfFilteredNodes.forEach((node: TreeNode) => {
       this._recursivelyShowChildren(node);
     });
@@ -43,7 +74,7 @@ export class SearchbarComponent {
   /* collapse tree if nothing being being search for */
   private _shouldCollapseTree = (searchHasNoContent: boolean) => {
     if (searchHasNoContent) {
-      this.sharedDataSvc.tree.treeModel.collapseAll();
+      this.sharedDataSvc.getTree().treeModel.collapseAll();
     }
   };
 
@@ -63,9 +94,10 @@ export class SearchbarComponent {
   private _generateListOfFilteredNodes(
     selectedValues: string[],
     node: TreeNode
-  ) {
+  ): boolean {
     const nodeExists = fuzzySearch(selectedValues, node.data.name);
-    nodeExists && this.listOfFilteredNodes.push(node);
+    (!selectedValues.length || nodeExists) &&
+      this.listOfFilteredNodes.push(node);
     return nodeExists;
   }
 }

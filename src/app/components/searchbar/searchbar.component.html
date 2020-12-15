@@ -3,9 +3,19 @@
   width="50vw"
   placeholder="Search"
   [callback]="filterTree(search)"
-  ></app-multiple-autocomplete>
+></app-multiple-autocomplete>
 
 <div class="search-checkbox-container">
-  <mat-checkbox class="search-checkbox">Food</mat-checkbox>
-  <mat-checkbox class="search-checkbox">Tags</mat-checkbox>
+  <mat-checkbox
+    class="search-checkbox"
+    [(ngModel)]="food"
+    (change)="onCheckboxChange($event, search)"
+    >Food</mat-checkbox
+  >
+  <mat-checkbox
+    class="search-checkbox"
+    [(ngModel)]="tags"
+    (change)="onCheckboxChange($event, search)"
+    >Tags</mat-checkbox
+  >
 </div>
