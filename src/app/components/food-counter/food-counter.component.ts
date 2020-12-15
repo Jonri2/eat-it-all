@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
+import { map } from 'lodash';
 
 @Component({
   selector: 'app-food-counter',
@@ -14,6 +16,14 @@ export class FoodCounterComponent implements OnInit {
     this.treeSvc.getNodes().subscribe((res) => {
       this.count = 0;
       this._recursivelyCountNodes(res.nodes, []);
+    });
+    this.treeSvc.filter.subscribe((nodes) => {
+      this.count = 0;
+      const dataNodes = map(nodes, 'data');
+      if (dataNodes.length && !dataNodes.includes(undefined)) {
+        nodes = dataNodes;
+      }
+      this._recursivelyCountNodes(nodes, []);
     });
   }
 

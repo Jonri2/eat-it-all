@@ -34,6 +34,11 @@ export class SearchbarComponent {
   filterTree = ({ selectedValues }: SelectedValues) => () => {
     const searchHasContent = selectedValues.length === 0;
     this._updateTreeNodes(searchHasContent, selectedValues);
+    if (searchHasContent) {
+      this.treeSvc.filterCallback(this.treeSvc.getLocalNodes());
+    } else if (this.listOfFilteredNodes.length) {
+      this.treeSvc.filterCallback(this.listOfFilteredNodes);
+    }
   };
 
   onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
@@ -74,10 +79,11 @@ export class SearchbarComponent {
       const tree: Tree = this.sharedDataSvc.getTree();
       tree.treeModel.nodes = this.listOfFilteredNodes;
       this.sharedDataSvc.setTree(tree);
+    } else if (!this.tags || this.food) {
+      this.listOfFilteredNodes.forEach((node: TreeNode) => {
+        this._recursivelyShowChildren(node);
+      });
     }
-    this.listOfFilteredNodes.forEach((node: TreeNode) => {
-      this._recursivelyShowChildren(node);
-    });
     this._shouldCollapseTree(searchHasNoContent);
   }
 
