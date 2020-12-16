@@ -22,6 +22,7 @@ export class TreeService {
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
     });
+    this.userEmail = window.localStorage.getItem("email");
   }
 
   getUserDoc = () => {
