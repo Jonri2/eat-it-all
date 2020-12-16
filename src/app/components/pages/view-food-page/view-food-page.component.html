@@ -4,7 +4,6 @@
   <div class="content">
 
     <mat-card *ngIf="!isTreeLoading && !!node" class="food-card">
-      <mat-card-header>
         <mat-card-title>{{ node?.data?.name || node?.name }}</mat-card-title>
         <mat-chip-list aria-label="Food Tags">
           <mat-chip
@@ -13,7 +12,6 @@
           >{{ tag }}</mat-chip
           >
         </mat-chip-list>
-      </mat-card-header>
       <mat-card-content>
         <p>{{ node?.data?.location || node?.location }}</p>
         <mat-card-subtitle>{{
@@ -25,7 +23,7 @@
         [max]="5"
         [readonly]="true"
         ></ngb-rating>
-        <small>{{ node?.data?.id || node?.id }}</small>
+        <small class="block">{{ node?.data?.id || node?.id }}</small>
       </mat-card-content>
     </mat-card>
 
