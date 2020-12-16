@@ -36,6 +36,7 @@ import { ListPageComponent } from './components/pages/list-page/list-page.compon
 import { ViewFoodPageComponent } from './components/pages/view-food-page/view-food-page.component';
 import { RouterModule } from '@angular/router';
 import { LoginPageComponent } from './components/pages/login/login.component';
+import { AnimatedComponent } from './components/animated/animated.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { LoginPageComponent } from './components/pages/login/login.component';
     ListPageComponent,
     ViewFoodPageComponent,
     LoginPageComponent,
+    AnimatedComponent,
   ],
   imports: [
     BrowserModule,
