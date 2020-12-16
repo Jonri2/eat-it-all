@@ -8,6 +8,7 @@
     width="100%"
     [tagsOnly]="true"
     (values)="onTagsChange($event)"
+    [selectedValues]="node.tags || []"
   ></app-multiple-autocomplete>
   <mat-form-field class="form-field">
     <mat-label>Location</mat-label>
