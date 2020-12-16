@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
-import { map } from 'lodash';
+import { map, cloneDeep } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Filter, Node, Tree } from '../../interfaces/interfaces';
@@ -14,6 +14,7 @@ import { Filter, Node, Tree } from '../../interfaces/interfaces';
 })
 export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
+  foodNodes: Node[] = [];
   clickedNode: Node;
   filter: Filter;
   // get handle on tree template variable
@@ -56,21 +57,22 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this.filter = filter;
     });
     this.treeSvc.getNodes().subscribe((res) => {
-      console.log('tree');
-      console.log(res.nodes);
-      if (!this.filter.food || this.filter.tags) {
-        this.nodes = res.nodes;
+      if (this.filter.food && !this.filter.tags) {
+        const addedNode: Node = this.treeSvc.getDiff(this.nodes, res.nodes);
+        if (addedNode) {
+          const foodNodesCopy = cloneDeep(this.foodNodes);
+          foodNodesCopy.push(addedNode);
+          this.foodNodes = foodNodesCopy;
+        }
       }
+      this.nodes = res.nodes;
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
       const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
-      this.nodes =
+      this.foodNodes =
         nodes.length > 0 && !nodes.includes(undefined)
           ? nodes
           : tree.treeModel?.nodes;
-
-      console.log('shared');
-      console.log(this.nodes);
     });
   }
 

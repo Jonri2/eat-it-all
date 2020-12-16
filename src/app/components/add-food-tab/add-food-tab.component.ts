@@ -33,11 +33,7 @@ export class AddFoodTabComponent {
   constructor(
     private treeSvc: TreeService,
     private sharedTreeSvc: SharedTreeDataService
-  ) {
-    this.treeSvc.getNodes().subscribe(() => {
-      this.treeSvc.nodeAddedCallback();
-    });
-  }
+  ) {}
 
   ngOnInit() {
     this._setEditingValues();
@@ -88,7 +84,7 @@ export class AddFoodTabComponent {
         name,
         date,
       } = this.sharedTreeSvc.node.data;
-      this.oldNodeValues = {...this.sharedTreeSvc.node};
+      this.oldNodeValues = { ...this.sharedTreeSvc.node };
       this.currentRate = rating;
       this.node = {
         name,

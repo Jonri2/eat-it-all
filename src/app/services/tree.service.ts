@@ -96,36 +96,36 @@ export class TreeService {
       this._nodes = res.nodes;
     });
     // Run this to reset the db
-    // this.getUserDoc().set({
-    //   nodes: [
-    //     {
-    //       id: 1,
-    //       name: 'Fruit',
-    //       children: [
-    //         { id: 2, name: '🍎 Apple' },
-    //         { id: 8, name: '🍋 Lemon' },
-    //         { id: 9, name: '🍋🟩 Lime' },
-    //         { id: 10, name: '🍊 Orange' },
-    //         { id: 11, name: '🍓 Strawberry' },
-    //       ],
-    //       isTag: true,
-    //     },
-    //     {
-    //       id: 4,
-    //       name: 'Meat',
-    //       children: [
-    //         { id: 5, name: '🐔 Cooked Chicken' },
-    //         {
-    //           id: 6,
-    //           name: '🐄 Cow Related',
-    //           children: [{ id: 7, name: '🍔 Hamburger' }],
-    //           isTag: true,
-    //         },
-    //       ],
-    //       isTag: true,
-    //     },
-    //   ],
-    // });
+    this.getUserDoc().set({
+      nodes: [
+        {
+          id: 1,
+          name: 'Fruit',
+          children: [
+            { id: 2, name: '🍎 Apple' },
+            { id: 8, name: '🍋 Lemon' },
+            { id: 9, name: '🍋🟩 Lime' },
+            { id: 10, name: '🍊 Orange' },
+            { id: 11, name: '🍓 Strawberry' },
+          ],
+          isTag: true,
+        },
+        {
+          id: 4,
+          name: 'Meat',
+          children: [
+            { id: 5, name: '🐔 Cooked Chicken' },
+            {
+              id: 6,
+              name: '🐄 Cow Related',
+              children: [{ id: 7, name: '🍔 Hamburger' }],
+              isTag: true,
+            },
+          ],
+          isTag: true,
+        },
+      ],
+    });
   };
 
   hasTag = (tag: string, node?: Node): boolean => {
@@ -173,5 +173,34 @@ export class TreeService {
 
   _getNames = (nodes: Node[]): string[] => {
     return map(nodes, 'name');
+  };
+
+  getDiff = (oldNodes: Node[], newNodes: Node[]): Node => {
+    const idList = this.getIdList(oldNodes);
+    return this.findDiffNode(newNodes, idList);
+  };
+
+  findDiffNode = (nodes: Node[], ids: Node['id'][]): Node => {
+    let foundNode: Node;
+    forEach(nodes, (node) => {
+      if (!ids.includes(node.id) && !node.isTag) {
+        foundNode = node;
+      }
+      if (!foundNode) {
+        foundNode = this.findDiffNode(node.children, ids);
+      }
+    });
+    return foundNode;
+  };
+
+  getIdList = (nodes: Node[], ids?: Node['id'][]): Node['id'][] => {
+    if (!ids) {
+      ids = [];
+    }
+    forEach(nodes, (node) => {
+      ids.push(node.id);
+      this.getIdList(node.children, ids);
+    });
+    return ids;
   };
 }
