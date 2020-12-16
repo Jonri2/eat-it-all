@@ -16,7 +16,7 @@ export class FoodCounterComponent implements OnInit {
       this.count = 0;
       this._recursivelyCountNodes(res.nodes, []);
     });
-    this.treeSvc.filter.subscribe((nodes) => {
+    this.treeSvc.counter.subscribe((nodes) => {
       this.count = 0;
       const dataNodes = map(nodes, 'data');
       if (dataNodes.length && !dataNodes.includes(undefined)) {

@@ -4,7 +4,7 @@ import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
 import { map } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
-import { Node, Tree } from '../../interfaces/interfaces';
+import { Filter, Node, Tree } from '../../interfaces/interfaces';
 
 // References: https://stackoverflow.com/a/41427647/9931154
 @Component({
@@ -15,6 +15,7 @@ import { Node, Tree } from '../../interfaces/interfaces';
 export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
   clickedNode: Node;
+  filter: Filter;
   // get handle on tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
@@ -51,8 +52,15 @@ export class TreeComponent implements OnInit, AfterViewInit {
     private sharedDataSvc: SharedTreeDataService,
     private router: Router
   ) {
+    this.treeSvc.filter.subscribe((filter: Filter) => {
+      this.filter = filter;
+    });
     this.treeSvc.getNodes().subscribe((res) => {
-      this.nodes = res.nodes;
+      console.log('tree');
+      console.log(res.nodes);
+      if (!this.filter.food || this.filter.tags) {
+        this.nodes = res.nodes;
+      }
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
       const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
@@ -60,6 +68,9 @@ export class TreeComponent implements OnInit, AfterViewInit {
         nodes.length > 0 && !nodes.includes(undefined)
           ? nodes
           : tree.treeModel?.nodes;
+
+      console.log('shared');
+      console.log(this.nodes);
     });
   }
 

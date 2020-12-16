@@ -14,9 +14,14 @@ interface CustomNodeFields {
 /* A custom tree node
 ref typescript docs: https://www.typescriptlang.org/docs/handbook/utility-types.html
 */
-export type Node = Partial<Omit<TreeNode, "children">> & CustomNodeFields;
+export type Node = Partial<Omit<TreeNode, 'children'>> & CustomNodeFields;
 
 /* type of the tree object displayed on app */
 export interface Tree {
   treeModel: TreeModel;
+}
+
+export interface Filter {
+  food: boolean;
+  tags: boolean;
 }

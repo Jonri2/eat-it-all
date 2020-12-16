@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Node } from '../interfaces/interfaces';
+import { Filter, Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
 import { map } from 'lodash';
@@ -14,13 +14,20 @@ export class TreeService {
   isLoading: boolean = true;
   private nodeAddedSubject = new Subject();
   nodeAdded = this.nodeAddedSubject.asObservable();
-  private filterSubject = new Subject<Node[]>();
+  private counterSubject = new Subject<Node[]>();
+  counter = this.counterSubject.asObservable();
+  private filterSubject = new Subject();
   filter = this.filterSubject.asObservable();
-  userEmail: string;
+  userEmail: string = 'jde27@students.calvin.edu';
+  nodeAddPending: boolean = false;
 
   constructor(private db: AngularFirestore) {
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
+      if (this.nodeAddPending) {
+        this.nodeAddPending = false;
+        this.nodeAddedCallback();
+      }
     });
     this.userEmail = window.localStorage.getItem('email');
   }
@@ -53,7 +60,7 @@ export class TreeService {
       //   console.log("delete")
       // }
     }
-
+    this.nodeAddPending = true;
     if (node.tags && node.tags.length) {
       forEach(node.tags, (tag) => {
         forEach(this._nodes, (topNode) => {
@@ -156,8 +163,12 @@ export class TreeService {
     this.nodeAddedSubject.next();
   };
 
-  filterCallback = (nodes: Node[]) => {
-    this.filterSubject.next(nodes);
+  counterCallback = (nodes: Node[]) => {
+    this.counterSubject.next(nodes);
+  };
+
+  filterCallback = (filters: Filter) => {
+    this.filterSubject.next(filters);
   };
 
   _getNames = (nodes: Node[]): string[] => {

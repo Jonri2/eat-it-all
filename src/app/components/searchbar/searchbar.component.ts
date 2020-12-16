@@ -28,6 +28,7 @@ export class SearchbarComponent {
     this.treeSvc.nodeAdded.subscribe(() => {
       this.filterTree({ selectedValues: [] })();
     });
+    this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
   }
 
   /* will filter the tree and only display nodes that match selected values */
@@ -37,13 +38,14 @@ export class SearchbarComponent {
 
     // Update counter based on search
     if (searchHasContent) {
-      this.treeSvc.filterCallback(this.treeSvc.getLocalNodes());
+      this.treeSvc.counterCallback(this.treeSvc.getLocalNodes());
     } else if (this.listOfFilteredNodes.length) {
-      this.treeSvc.filterCallback(this.listOfFilteredNodes);
+      this.treeSvc.counterCallback(this.listOfFilteredNodes);
     }
   };
 
   onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
+    this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
     const tree: Tree = this.sharedDataSvc.getTree();
     tree.treeModel.nodes = this.treeSvc.getLocalNodes();
     this.sharedDataSvc.setTree(tree);
@@ -81,6 +83,8 @@ export class SearchbarComponent {
       const tree: Tree = this.sharedDataSvc.getTree();
       tree.treeModel.nodes = this.listOfFilteredNodes;
       this.sharedDataSvc.setTree(tree);
+
+      // If The Tags checkbox is set, don't show children
     } else if (!this.tags || this.food) {
       this.listOfFilteredNodes.forEach((node: TreeNode) => {
         this._recursivelyShowChildren(node);
