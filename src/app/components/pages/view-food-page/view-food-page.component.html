@@ -1,11 +1,6 @@
 <div>
   <button mat-flat-button routerLink="/list">Back to list</button>
-  <button
-    mat-fab
-    class="edit-button"
-  >
-    <mat-icon>edit</mat-icon>
-  </button>
+  <app-add-popover buttonType="edit"></app-add-popover>
   <div *ngIf="!isTreeLoading && !!node">
     <mat-card class="example-card">
       <mat-card-header>

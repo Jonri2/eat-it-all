@@ -36,7 +36,7 @@ export class ViewFoodPageComponent implements OnInit {
   */
   private _fallbackData = () => {
     if (this.node === undefined) {
-      [this.node] = this.nodes.filter((n) => n.id === this.id);
+      [this.node] = this.nodes.filter((n) => (n?.id === this.id) || n?.data?.id === this.id);
     }
   };
 
