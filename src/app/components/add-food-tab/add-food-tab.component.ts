@@ -1,9 +1,16 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from 'src/app/interfaces/interfaces';
 import { pickBy, identity, forEach } from 'lodash';
 import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
+import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -20,11 +27,20 @@ export class AddFoodTabComponent {
   @Output() submitted: EventEmitter<boolean> = new EventEmitter();
   @ViewChild(MultipleAutocompleteComponent)
   tagsComponent: MultipleAutocompleteComponent;
+  @Input() isEditing: boolean = false;
+  oldNodeValues: Node;
 
-  constructor(private treeSvc: TreeService) {
-    this.treeSvc.getNodes().subscribe((res) => {
+  constructor(
+    private treeSvc: TreeService,
+    private sharedTreeSvc: SharedTreeDataService
+  ) {
+    this.treeSvc.getNodes().subscribe(() => {
       this.treeSvc.nodeAddedCallback();
     });
+  }
+
+  ngOnInit() {
+    this._setEditingValues();
   }
 
   onRateChange = (rating: number) => {
@@ -48,14 +64,38 @@ export class AddFoodTabComponent {
       }
     });
 
-    this.treeSvc.addNode(this.node);
-    this.node = {
-      name: '',
-      location: undefined,
-      date: undefined,
-    };
-    this.currentRate = 0;
-    this.tagsComponent.clearSelections();
+    this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
+
+    if (!this.isEditing) {
+      this.node = {
+        name: '',
+        location: undefined,
+        date: undefined,
+      };
+      this.currentRate = 0;
+      this.tagsComponent.clearSelections();
+    }
+
     this.submitted.emit(true);
   };
+
+  private _setEditingValues() {
+    if (this.isEditing) {
+      const {
+        rating,
+        location,
+        tags,
+        name,
+        date,
+      } = this.sharedTreeSvc.node.data;
+      this.oldNodeValues = {...this.sharedTreeSvc.node};
+      this.currentRate = rating;
+      this.node = {
+        name,
+        location,
+        date,
+        tags,
+      };
+    }
+  }
 }

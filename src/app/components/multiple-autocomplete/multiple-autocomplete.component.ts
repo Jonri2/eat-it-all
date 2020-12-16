@@ -37,9 +37,9 @@ export class MultipleAutocompleteComponent {
   removable = true;
   searchCtrl = new FormControl();
   filteredOptions: Observable<string[]>;
-  selectedValues: string[] = [];
   allOptions: string[] = [];
 
+  @Input() selectedValues: string[] = [];
   @Input() separatorKeysCodes: number[] = [ENTER, COMMA];
   @Input() placeholder: string;
   @Input() width: string;

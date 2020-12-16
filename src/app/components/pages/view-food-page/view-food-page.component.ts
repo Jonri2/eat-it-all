@@ -13,7 +13,6 @@ export class ViewFoodPageComponent implements OnInit {
   nodes: Node[] = [];
   node: Node;
   id: string;
-  isUndefined: boolean = false;
   isTreeLoading: boolean = true;
 
   constructor(
@@ -37,11 +36,8 @@ export class ViewFoodPageComponent implements OnInit {
   */
   private _fallbackData = () => {
     if (this.node === undefined) {
-      [this.node] = this.nodes.filter((n) => n.id === this.id);
+      [this.node] = this.nodes.filter((n) => (n?.id === this.id) || n?.data?.id === this.id);
     }
-
-    // Possibly undefined after filter.
-    this.isUndefined = this.node === undefined;
   };
 
   /* When routing to the page, it sets the node data

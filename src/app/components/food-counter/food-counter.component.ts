@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
 import { map } from 'lodash';

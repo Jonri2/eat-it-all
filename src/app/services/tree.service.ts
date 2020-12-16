@@ -22,6 +22,7 @@ export class TreeService {
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
     });
+    this.userEmail = window.localStorage.getItem('email');
   }
 
   getUserDoc = () => {
@@ -41,7 +42,18 @@ export class TreeService {
     return this.getUserDoc().valueChanges();
   };
 
-  addNode = (node: Node) => {
+  addNode = (node: Node, oldNode?: Node) => {
+    if (oldNode) {
+      // // Copy over the id
+      // TODO: need to do some hard logic to remove the node
+      // node.id = oldNode.data.id;
+      // const index = this._nodes.indexOf();
+      // if (index > -1) {
+      //   this._nodes.splice(index, 1);
+      //   console.log("delete")
+      // }
+    }
+
     if (node.tags && node.tags.length) {
       forEach(node.tags, (tag) => {
         forEach(this._nodes, (topNode) => {
