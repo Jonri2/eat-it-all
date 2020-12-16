@@ -1,4 +1,39 @@
-<button mat-flat-button routerLink="/list">Back to list</button>
-<p *ngIf="!isTreeLoading && !!node">{{node?.id}}</p>
-<p *ngIf="!isTreeLoading && !node">Could not find food with id: {{id}}</p>
-<p *ngIf="isTreeLoading">LOADING</p>
+<div>
+  <button mat-flat-button routerLink="/list">Back to list</button>
+  <button
+    mat-fab
+    class="edit-button"
+  >
+    <mat-icon>edit</mat-icon>
+  </button>
+  <div *ngIf="!isTreeLoading && !!node">
+    <mat-card class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{ node?.data?.name || node?.name }}</mat-card-title>
+        <mat-chip-list aria-label="Food Tags">
+          <mat-chip
+            [disableRipple]="true"
+            *ngFor="let tag of node?.data?.tags || node?.tags"
+            >{{ tag }}</mat-chip
+          >
+        </mat-chip-list>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ node?.data?.location || node?.location }}</p>
+        <mat-card-subtitle>{{
+          node?.data?.date || node?.date
+        }}</mat-card-subtitle>
+        <ngb-rating
+          class="rating"
+          [rate]="node?.data?.rating || node?.rating || 0"
+          [max]="5"
+          [readonly]="true"
+        ></ngb-rating>
+        <small>{{ node?.data?.id || node?.id }}</small>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <p *ngIf="!isTreeLoading && !node">Could not find food with id: {{ id }}</p>
+  <p *ngIf="isTreeLoading">LOADING</p>
+</div>
