@@ -28,6 +28,7 @@ export class AddFoodTabComponent {
   @ViewChild(MultipleAutocompleteComponent)
   tagsComponent: MultipleAutocompleteComponent;
   @Input() isEditing: boolean = false;
+  oldNodeValues: Node;
 
   constructor(
     private treeSvc: TreeService,
@@ -63,14 +64,18 @@ export class AddFoodTabComponent {
       }
     });
 
-    this.treeSvc.addNode(this.node);
-    this.node = {
-      name: '',
-      location: undefined,
-      date: undefined,
-    };
-    this.currentRate = 0;
-    this.tagsComponent.clearSelections();
+    this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
+
+    if (!this.isEditing) {
+      this.node = {
+        name: '',
+        location: undefined,
+        date: undefined,
+      };
+      this.currentRate = 0;
+      this.tagsComponent.clearSelections();
+    }
+
     this.submitted.emit(true);
   };
 
@@ -83,6 +88,7 @@ export class AddFoodTabComponent {
         name,
         date,
       } = this.sharedTreeSvc.node.data;
+      this.oldNodeValues = {...this.sharedTreeSvc.node};
       this.currentRate = rating;
       this.node = {
         name,
