@@ -25,11 +25,7 @@
         [treeDragEnabled]="node.allowDrag()"
       >
         <!-- Update this is you want to override what each node is displayed as -->
-        <tree-node-content
-          [node]="node"
-          [index]="index"
-          *ngIf="node.isVisible || node.isVisible === undefined"
-        ></tree-node-content>
+        <tree-node-content [node]="node" [index]="index"></tree-node-content>
       </div>
     </div>
   </ng-template>
