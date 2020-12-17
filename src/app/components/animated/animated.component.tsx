@@ -48,9 +48,11 @@ export class AnimatedComponent
   }
 
   private render() {
-    ReactDOM.render(
-      <AnimateShowAndHide children={this.value} />,
-      this.containerRef.nativeElement
-    );
+    if (this.containerRef) {
+      ReactDOM.render(
+        <AnimateShowAndHide children={this.value} />,
+        this.containerRef.nativeElement
+      );
+    }
   }
 }

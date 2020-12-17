@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { Tree } from 'src/app/interfaces/interfaces';
+import { Tree, Node } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
-import { map } from 'lodash';
+import { map, filter } from 'lodash';
 
 interface SelectedValues {
   selectedValues: string[];
@@ -17,7 +17,7 @@ interface SelectedValues {
   styleUrls: ['./searchbar.component.scss'],
 })
 export class SearchbarComponent {
-  listOfFilteredNodes: TreeNode[] = [];
+  listOfFilteredNodes: Node[] = [];
   @Input() food: boolean = true;
   @Input() tags: boolean = true;
 
@@ -26,13 +26,18 @@ export class SearchbarComponent {
     private treeSvc: TreeService
   ) {
     this.treeSvc.nodeAdded.subscribe(() => {
-      this.filterTree({ selectedValues: [] })();
+      if (this.tags && !this.food) {
+        this.filterTree({ selectedValues: [] })();
+      }
     });
     this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
   }
 
   /* will filter the tree and only display nodes that match selected values */
   filterTree = ({ selectedValues }: SelectedValues) => () => {
+    const tree: Tree = this.sharedDataSvc.getTree();
+    tree.treeModel.nodes = this.treeSvc.getLocalNodes();
+    this.sharedDataSvc.setTree(tree);
     const searchHasContent = selectedValues.length === 0;
     this._updateTreeNodes(searchHasContent, selectedValues);
 
@@ -46,9 +51,6 @@ export class SearchbarComponent {
 
   onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
     this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
-    const tree: Tree = this.sharedDataSvc.getTree();
-    tree.treeModel.nodes = this.treeSvc.getLocalNodes();
-    this.sharedDataSvc.setTree(tree);
     this.filterTree(values)();
   };
 
@@ -58,48 +60,36 @@ export class SearchbarComponent {
     selectedValues: string[]
   ) {
     this.listOfFilteredNodes = [];
-    this.sharedDataSvc.getTree().treeModel.filterNodes((node: TreeNode) => {
-      let showNode = true;
-      // If only the Tag checkbox is selected, hide the food nodes
-      if (this.tags && !this.food) {
-        showNode = node.data.isTag;
-        // If only the Food checkbox is selected, add the food nodes to the filtered nodes list
-      } else if (this.food && !this.tags) {
-        if (!node.data.isTag) {
-          this._generateListOfFilteredNodes(selectedValues, node);
+    const tree: Tree = this.sharedDataSvc.getTree();
+    const nodes: Node[] = this.treeSvc.filterNodes(
+      tree.treeModel.nodes,
+      (node: Node) => {
+        let showNode = true;
+        // If only the Tag checkbox is selected, hide the food nodes
+        if (this.tags && !this.food) {
+          showNode = node.isTag;
+          // If only the Food checkbox is selected, add the food nodes to the filtered nodes list
+        } else if (this.food && !this.tags) {
+          if (!node.isTag) {
+            this._generateListOfFilteredNodes(selectedValues, node);
+          }
         }
+        // If there is no search, don't filter the list
+        // If there is, check if the node is found in the search. Filter it out if it is not
+        return (
+          showNode &&
+          (searchHasNoContent ||
+            this._generateListOfFilteredNodes(selectedValues, node))
+        );
       }
-      // If there is no search, don't filter the list
-      // If there is, check if the node is found in the search. Filter it out if it is not
-      return (
-        showNode &&
-        (searchHasNoContent ||
-          this._generateListOfFilteredNodes(selectedValues, node))
-      );
-    });
+    );
     // Switch the tree to food items if the Food checkbox is set
-    // Only works when there is no search
-    if (this.food && !this.tags && searchHasNoContent) {
-      const tree: Tree = this.sharedDataSvc.getTree();
+    if (this.food && !this.tags) {
       tree.treeModel.nodes = this.listOfFilteredNodes;
-      this.sharedDataSvc.setTree(tree);
-
-      // If The Tags checkbox is set, don't show children
-    } else if (!this.tags || this.food) {
-      this.listOfFilteredNodes.forEach((node: TreeNode) => {
-        this._recursivelyShowChildren(node);
-      });
+    } else {
+      tree.treeModel.nodes = nodes;
     }
-  }
-
-  /* show all children for a node, recursively.
-    The base case is handled by node.children?
-  */
-  private _recursivelyShowChildren(node: TreeNode) {
-    node.children?.forEach((child: TreeNode) => {
-      child.show();
-      this._recursivelyShowChildren(child);
-    });
+    this.sharedDataSvc.setTree(tree);
   }
 
   /* Check if the node searched for exists and make a list.
@@ -107,12 +97,12 @@ export class SearchbarComponent {
   */
   private _generateListOfFilteredNodes(
     selectedValues: string[],
-    node: TreeNode
+    node: Node
   ): boolean {
-    const nodeExists = fuzzySearch(selectedValues, node.data.name);
+    const nodeExists = fuzzySearch(selectedValues, node.name);
     const ids = map(this.listOfFilteredNodes, 'id');
     (!selectedValues.length || nodeExists) &&
-      !ids.includes(node.data.id) &&
+      !ids.includes(node.id) &&
       this.listOfFilteredNodes.push(node);
     return nodeExists;
   }

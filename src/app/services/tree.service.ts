@@ -3,7 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Filter, Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { map } from 'lodash';
+import { map, filter, cloneDeep } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class TreeService {
   private counterSubject = new Subject<Node[]>();
   counter = this.counterSubject.asObservable();
   private filterSubject = new Subject();
-  filter = this.filterSubject.asObservable();
+  filter$ = this.filterSubject.asObservable();
   userEmail: string = 'jde27@students.calvin.edu';
   nodeAddPending: boolean = false;
 
@@ -92,9 +92,6 @@ export class TreeService {
 
   onLogin = (email: string) => {
     this.userEmail = email;
-    this.getNodes().subscribe((res) => {
-      this._nodes = res.nodes;
-    });
     // Run this to reset the db
     this.getUserDoc().set({
       nodes: [
@@ -151,12 +148,11 @@ export class TreeService {
   };
 
   setNodes = (nodes: Node[]) => {
-    this._nodes = nodes;
-    this.getUserDoc().set({ nodes: this._nodes });
+    this.getUserDoc().set({ nodes: nodes });
   };
 
   getLocalNodes = () => {
-    return this._nodes;
+    return cloneDeep(this._nodes);
   };
 
   nodeAddedCallback = () => {
@@ -202,5 +198,28 @@ export class TreeService {
       this.getIdList(node.children, ids);
     });
     return ids;
+  };
+
+  filterNodes = (nodes: Node[], filterFn: (node: Node) => boolean): Node[] => {
+    return filter(nodes, this.filterNode(filterFn));
+  };
+
+  filterNode = (filterFn: (node: Node) => boolean) => {
+    return (node: Node): boolean => {
+      let isVisible = filterFn(node);
+
+      if (node.children) {
+        const filteredChildren: Node[] = [];
+        // if one of node's children passes filter then this node is also visible
+        node.children.forEach((child) => {
+          if (this.filterNode(filterFn)(child)) {
+            isVisible = true;
+            filteredChildren.push(child);
+          }
+        });
+        node.children = filteredChildren;
+      }
+      return isVisible;
+    };
   };
 }

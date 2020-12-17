@@ -76,7 +76,7 @@ export class AddFoodTabComponent {
   };
 
   private _setEditingValues() {
-    if (this.isEditing) {
+    if (this.isEditing && this.sharedTreeSvc.node) {
       const {
         rating,
         location,

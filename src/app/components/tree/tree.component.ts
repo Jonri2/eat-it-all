@@ -53,7 +53,7 @@ export class TreeComponent implements OnInit, AfterViewInit {
     private sharedDataSvc: SharedTreeDataService,
     private router: Router
   ) {
-    this.treeSvc.filter.subscribe((filter: Filter) => {
+    this.treeSvc.filter$.subscribe((filter: Filter) => {
       this.filter = filter;
     });
     this.treeSvc.getNodes().subscribe((res) => {
@@ -68,11 +68,16 @@ export class TreeComponent implements OnInit, AfterViewInit {
       this.nodes = res.nodes;
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
-      const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
-      this.foodNodes =
-        nodes.length > 0 && !nodes.includes(undefined)
-          ? nodes
+      const tempNodes: Node[] = map(tree.treeModel?.nodes, 'data');
+      const nodes: Node[] =
+        tempNodes.length > 0 && !tempNodes.includes(undefined)
+          ? tempNodes
           : tree.treeModel?.nodes;
+      if (this.filter?.food && !this.filter?.tags) {
+        this.foodNodes = nodes;
+      } else {
+        this.nodes = nodes;
+      }
     });
   }
 
