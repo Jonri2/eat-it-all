@@ -147,8 +147,8 @@ export class TreeService {
     return tagFound;
   };
 
-  setNodes = (nodes: Node[]) => {
-    this.getUserDoc().set({ nodes: nodes });
+  setNodes = () => {
+    this.getUserDoc().set({ nodes: this._nodes });
   };
 
   getLocalNodes = () => {
@@ -221,5 +221,28 @@ export class TreeService {
       }
       return isVisible;
     };
+  };
+
+  moveNode = (from: TreeNode, to: TreeNode) => {
+    const fromIndex = from.parent.children.indexOf(from);
+    const fromParent = from.parent;
+    const fromChildren = fromParent.getField('children');
+
+    if (!to.parent.getField('children')) {
+      to.parent.setField('children', []);
+    }
+    const toChildren = to.parent.getField('children');
+    const originalNode = fromChildren.splice(fromIndex, 1)[0];
+
+    let toIndex =
+      fromParent === to.parent && to.index > fromIndex
+        ? to.index - 1
+        : to.index;
+    toChildren.splice(toIndex, 0, originalNode);
+    fromParent.treeModel.update();
+    if (to.parent.treeModel !== fromParent.treeModel) {
+      to.parent.treeModel.update();
+    }
+    this._nodes = fromParent.treeModel.nodes;
   };
 }

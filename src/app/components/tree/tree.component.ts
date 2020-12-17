@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
+import { IActionMapping } from '@circlon/angular-tree-component';
 import { map, cloneDeep } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
@@ -32,8 +32,8 @@ export class TreeComponent implements OnInit, AfterViewInit {
           !map(to.parent.children, 'id').includes(from.data.id) &&
           (to.parent.data.isTag || !to.parent.parent)
         ) {
-          TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
-          this.treeSvc.setNodes(this.nodes);
+          this.treeSvc.moveNode(from, to);
+          this.treeSvc.setNodes();
         }
       },
     },

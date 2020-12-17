@@ -9,6 +9,7 @@ interface CustomNodeFields {
   tags?: string[];
   children?: Node[];
   isTag?: boolean;
+  isVisible?: boolean;
 }
 
 /* A custom tree node
