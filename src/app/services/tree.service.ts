@@ -63,7 +63,9 @@ export class TreeService {
     }
     this.nodeAddPending = true;
     if (node.tags && node.tags.length) {
-      forEach(node.tags, (tag) => {
+      const nodeId = node.id;
+      forEach(node.tags, (tag, i) => {
+        node.id = `${nodeId}-${i}`;
         forEach(this._nodes, (topNode) => {
           this.searchTree(tag, node, topNode);
         });
@@ -173,32 +175,32 @@ export class TreeService {
   };
 
   getDiff = (oldNodes: Node[], newNodes: Node[]): Node => {
-    const idList = this.getIdList(oldNodes);
+    const idList = this.getNameList(oldNodes);
     return this.findDiffNode(newNodes, idList);
   };
 
-  findDiffNode = (nodes: Node[], ids: Node['id'][]): Node => {
+  findDiffNode = (nodes: Node[], names: Node['name'][]): Node => {
     let foundNode: Node;
     forEach(nodes, (node) => {
-      if (!ids.includes(node.id) && !node.isTag) {
+      if (!names.includes(node.name) && !node.isTag) {
         foundNode = node;
       }
       if (!foundNode) {
-        foundNode = this.findDiffNode(node.children, ids);
+        foundNode = this.findDiffNode(node.children, names);
       }
     });
     return foundNode;
   };
 
-  getIdList = (nodes: Node[], ids?: Node['id'][]): Node['id'][] => {
-    if (!ids) {
-      ids = [];
+  getNameList = (nodes: Node[], names?: Node['name'][]): Node['name'][] => {
+    if (!names) {
+      names = [];
     }
     forEach(nodes, (node) => {
-      ids.push(node.id);
-      this.getIdList(node.children, ids);
+      names.push(node.name);
+      this.getNameList(node.children, names);
     });
-    return ids;
+    return names;
   };
 
   filterNodes = (
@@ -247,34 +249,69 @@ export class TreeService {
         });
         node.children = filteredChildren;
       }
-      console.log(node.name);
-      console.log(isVisible);
-      console.log(turnVisible);
-      console.log(filterReturn);
       return isVisible || turnVisible || filterReturn;
     };
   };
 
-  moveNode = (from: TreeNode, to: TreeNode) => {
-    const fromIndex = from.parent.children.indexOf(from);
-    const fromParent = from.parent;
-    const fromChildren = fromParent.getField('children');
+  moveNode = (from: Node['id'], to: Node['id']): boolean => {
+    const nodeToMove: Node = this.getAndRemoveById(from);
+    this.addNodeAtId(nodeToMove, to);
+    this.nodeAddedSubject.next();
+    return nodeToMove !== undefined;
+  };
 
-    if (!to.parent.getField('children')) {
-      to.parent.setField('children', []);
+  getAndRemoveById = (id: Node['id'], nodes?: Node[]): Node => {
+    let foundNode: Node;
+    if (!nodes) {
+      nodes = this._nodes;
     }
-    const toChildren = to.parent.getField('children');
-    const originalNode = fromChildren.splice(fromIndex, 1)[0];
+    for (let node of nodes) {
+      if (node?.id === id) {
+        foundNode = node;
+        this.removeNode(node);
+        break;
+      }
+      if (node?.children) {
+        foundNode = this.getAndRemoveById(id, node.children);
+        if (foundNode) {
+          break;
+        }
+      }
+    }
+    return foundNode;
+  };
 
-    let toIndex =
-      fromParent === to.parent && to.index > fromIndex
-        ? to.index - 1
-        : to.index;
-    toChildren.splice(toIndex, 0, originalNode);
-    fromParent.treeModel.update();
-    if (to.parent.treeModel !== fromParent.treeModel) {
-      to.parent.treeModel.update();
+  removeNode = (nodeToRemove: Node, nodes?: Node[]) => {
+    if (!nodes) {
+      nodes = this._nodes;
     }
-    this._nodes = fromParent.treeModel.nodes;
+    for (let node of nodes) {
+      if (node?.children) {
+        const index = node.children.indexOf(nodeToRemove);
+        if (index > -1) {
+          node.children.splice(index, 1);
+          break;
+        }
+        this.removeNode(nodeToRemove, node.children);
+      }
+      if (node === nodeToRemove) {
+        this._nodes.splice(this._nodes.indexOf(nodeToRemove), 1);
+      }
+    }
+  };
+
+  addNodeAtId = (nodeToAdd: Node, id: Node['id'], nodes?: Node[]) => {
+    if (!nodes) {
+      nodes = this._nodes;
+    }
+    for (let node of nodes) {
+      if (node?.id === id) {
+        node.children.push(nodeToAdd);
+        break;
+      }
+      if (node?.children) {
+        this.addNodeAtId(nodeToAdd, id, node.children);
+      }
+    }
   };
 }

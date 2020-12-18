@@ -29,13 +29,13 @@ export class FoodCounterComponent implements OnInit {
   ngOnInit(): void {}
 
   /* Count number of nodes that aren't tags */
-  private _recursivelyCountNodes = (nodes: Node[], ids: Node['id'][]) => {
+  private _recursivelyCountNodes = (nodes: Node[], names: Node['name'][]) => {
     nodes?.forEach((node: Node) => {
-      if (!node.isTag && !ids.includes(node.id)) {
-        ids.push(node.id);
+      if (!node.isTag && !names.includes(node.name)) {
+        names.push(node.name);
         this.count++;
       }
-      this._recursivelyCountNodes(node.children, ids);
+      this._recursivelyCountNodes(node.children, names);
     });
   };
 }
