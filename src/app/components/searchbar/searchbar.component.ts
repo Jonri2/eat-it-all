@@ -4,7 +4,7 @@ import { Tree, Node } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
-import { map } from 'lodash';
+import { map, intersectionWith, isEqual } from 'lodash';
 
 interface SelectedValues {
   selectedValues: string[];
@@ -94,7 +94,9 @@ export class SearchbarComponent {
     Return: true, if the node exists, false otherwise.
   */
   private _generateListOfFilteredNodes(node: Node): boolean {
-    const nodeExists = fuzzySearch(this.selectedValues, node.name);
+    const nodeExists =
+      fuzzySearch(this.selectedValues, node.name) ||
+      intersectionWith(this.selectedValues, node.tags, isEqual).length;
     const ids = map(this.listOfFilteredNodes, 'id');
     if (
       (!this.selectedValues.length || nodeExists) &&
