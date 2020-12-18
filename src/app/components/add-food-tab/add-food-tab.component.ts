@@ -11,7 +11,6 @@ import { pickBy, identity, forEach } from 'lodash';
 import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
-import { formatCurrency } from '@angular/common';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -64,7 +63,6 @@ export class AddFoodTabComponent {
 
     this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
 
-    // if (!this.isEditing) {
     this.node = {
       name: '',
       location: undefined,
@@ -72,7 +70,6 @@ export class AddFoodTabComponent {
     };
     this.currentRate = 0;
     this.tagsComponent.clearSelections();
-    // }
 
     form.resetForm();
     this.submitted.emit(true);

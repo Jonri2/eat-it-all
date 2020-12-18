@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Filter, Node } from '../interfaces/interfaces';
+import { Filter, Node, Tree } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { map, filter, cloneDeep } from 'lodash';
+import { map, filter, cloneDeep, orderBy } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
+import { SharedTreeDataService } from './shared-tree-data.service';
 
 const resetTestData = false;
 
@@ -20,10 +21,11 @@ export class TreeService {
   counter = this.counterSubject.asObservable();
   private filterSubject = new Subject<Filter>();
   filter$ = this.filterSubject.asObservable();
-  userEmail: string = 'jde27@students.calvin.edu';
+  userEmail: string;
   nodeAddPending: boolean = false;
 
   constructor(private db: AngularFirestore) {
+    this.userEmail = window.localStorage.getItem('email');
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
       if (this.nodeAddPending) {
@@ -31,7 +33,6 @@ export class TreeService {
         this.nodeAddedCallback();
       }
     });
-    this.userEmail = window.localStorage.getItem('email');
   }
 
   getUserDoc = () => {
@@ -74,7 +75,7 @@ export class TreeService {
     } else if (!this._getNames(this._nodes).includes(node.name)) {
       this._nodes.push(node);
     }
-    this.getUserDoc().set({ nodes: this._nodes });
+    this.getUserDoc().set({ nodes: this.sortNodes(this._nodes) });
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
@@ -336,5 +337,16 @@ export class TreeService {
         this.addNodeAtId(nodeToAdd, id, node.children);
       }
     }
+  };
+
+  sortNodes = (nodes: Node[]): Node[] => {
+    nodes = orderBy(nodes, (node) => node.name.toLowerCase());
+    forEach(nodes, (node) => {
+      if (node.children) {
+        node.children = this.sortNodes(node.children);
+      }
+    });
+    console.log(nodes);
+    return nodes;
   };
 }
