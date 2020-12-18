@@ -18,7 +18,7 @@ export class TreeService {
   nodeAdded = this.nodeAddedSubject.asObservable();
   private counterSubject = new Subject<Node[]>();
   counter = this.counterSubject.asObservable();
-  private filterSubject = new Subject();
+  private filterSubject = new Subject<Filter>();
   filter$ = this.filterSubject.asObservable();
   userEmail: string = 'jde27@students.calvin.edu';
   nodeAddPending: boolean = false;

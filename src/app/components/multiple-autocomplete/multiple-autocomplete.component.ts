@@ -38,6 +38,7 @@ export class MultipleAutocompleteComponent {
   searchCtrl = new FormControl();
   filteredOptions: Observable<string[]>;
   allOptions: string[] = [];
+  tagsChecked: boolean = false;
 
   @Input() selectedValues: string[] = [];
   @Input() separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -52,12 +53,21 @@ export class MultipleAutocompleteComponent {
 
   constructor(private treeSvc: TreeService) {
     this.treeSvc.getNodes().subscribe((res) => {
-      this.allOptions = [];
-      forEach(res.nodes, (node) => {
-        this.getNames(node);
-      });
-      this.allOptions = orderBy(union(this.allOptions), (o) => o.toLowerCase());
+      this.getAllOptions(res.nodes);
     });
+
+    this.treeSvc.filter$.subscribe((filter) => {
+      this.tagsChecked = filter.tags && !filter.food;
+      this.getAllOptions(this.treeSvc.getLocalNodes());
+    });
+  }
+
+  getAllOptions = (nodes: Node[]) => {
+    this.allOptions = [];
+    forEach(nodes, (node) => {
+      this.getNames(node);
+    });
+    this.allOptions = orderBy(union(this.allOptions), (o) => o.toLowerCase());
 
     // Debounce is set to 30ms, since value changes frequently, which is imperceptible to the user.
     this.filteredOptions = this.searchCtrl.valueChanges
@@ -68,10 +78,10 @@ export class MultipleAutocompleteComponent {
           val ? this._filter(val) : this.allOptions.slice()
         )
       );
-  }
+  };
 
   getNames = (node: Node) => {
-    if (this.tagsOnly) {
+    if (this.tagsOnly || (!this.tagsOnly && this.tagsChecked)) {
       if (node.isTag) {
         this.allOptions.push(node.name);
       }
