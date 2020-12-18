@@ -220,7 +220,6 @@ export class TreeService {
 
       if (node.children) {
         const filteredChildren: Node[] = [];
-        // if one of node's children passes filter then this node is also visible
         node.children.forEach((child) => {
           // if the node passes filter and a search is occurring, show the children (according to the checkbox selection)
           let childFilter;
@@ -238,6 +237,7 @@ export class TreeService {
           if (childFilter === undefined) {
             childFilter = this.filterNode(filterFn, checkboxes)(child);
           }
+          // if one of node's children passes filter then this node is also visible
           if (childFilter) {
             isVisible = true;
             if (!filteredChildren.includes(child)) {
