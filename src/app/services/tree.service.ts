@@ -247,6 +247,10 @@ export class TreeService {
         });
         node.children = filteredChildren;
       }
+      console.log(node.name);
+      console.log(isVisible);
+      console.log(turnVisible);
+      console.log(filterReturn);
       return isVisible || turnVisible || filterReturn;
     };
   };

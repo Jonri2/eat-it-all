@@ -65,7 +65,9 @@ export class TreeComponent implements OnInit, AfterViewInit {
           this.foodNodes = foodNodesCopy;
         }
       }
-      this.nodes = res.nodes;
+      if (this.filter?.food || !this.filter?.tags) {
+        this.nodes = res.nodes;
+      }
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
       const tempNodes: Node[] = map(tree.treeModel?.nodes, 'data');
