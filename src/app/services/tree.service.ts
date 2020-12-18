@@ -346,7 +346,6 @@ export class TreeService {
         node.children = this.sortNodes(node.children);
       }
     });
-    console.log(nodes);
     return nodes;
   };
 }
