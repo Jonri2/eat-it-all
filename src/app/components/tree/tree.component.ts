@@ -34,7 +34,13 @@ export class TreeComponent implements OnInit, AfterViewInit {
           ) &&
           (to.parent.data.isTag || !to.parent.parent)
         ) {
-          if (this.treeSvc.moveNode(from.data.id, to.parent.data.id)) {
+          if (
+            this.treeSvc.moveNode(
+              from.data.id,
+              to.parent.data.id,
+              to.parent.data.name
+            )
+          ) {
             this.treeSvc.setNodes();
           }
         }

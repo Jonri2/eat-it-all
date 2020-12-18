@@ -256,9 +256,12 @@ export class TreeService {
     };
   };
 
-  moveNode = (from: Node['id'], to: Node['id']): boolean => {
+  moveNode = (from: Node['id'], to: Node['id'], toTag: string): boolean => {
     if (from !== to) {
       const nodeToMove: Node = this.getAndRemoveById(from);
+      if (nodeToMove.tags) {
+        nodeToMove.tags.push(toTag);
+      }
       to.toString().length < 15 && to.toString().length > 10
         ? this.addNodeAtId(nodeToMove)
         : this.addNodeAtId(nodeToMove, to);
@@ -296,6 +299,9 @@ export class TreeService {
       if (node?.children) {
         const index = node.children.indexOf(nodeToRemove);
         if (index > -1) {
+          if (nodeToRemove.tags) {
+            nodeToRemove.tags.splice(nodeToRemove.tags.indexOf(node.name), 1);
+          }
           node.children.splice(index, 1);
           break;
         }
