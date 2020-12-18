@@ -1,11 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { TreeNode } from '@circlon/angular-tree-component';
 import { Tree, Node } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
-import { map, filter } from 'lodash';
+import { map } from 'lodash';
 
 interface SelectedValues {
   selectedValues: string[];
