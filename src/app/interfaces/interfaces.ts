@@ -25,4 +25,5 @@ export interface Tree {
 export interface Filter {
   food: boolean;
   tags: boolean;
+  searchHasNoContent?: boolean;
 }

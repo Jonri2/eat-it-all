@@ -5,6 +5,7 @@ import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
 import { map, filter, cloneDeep } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
+import { Children } from 'react';
 
 @Injectable({
   providedIn: 'root',
@@ -200,26 +201,53 @@ export class TreeService {
     return ids;
   };
 
-  filterNodes = (nodes: Node[], filterFn: (node: Node) => boolean): Node[] => {
-    return filter(nodes, this.filterNode(filterFn));
+  filterNodes = (
+    nodes: Node[],
+    filterFn: (node: Node) => boolean,
+    checkboxes: Filter
+  ): Node[] => {
+    return filter(nodes, this.filterNode(filterFn, checkboxes));
   };
 
-  filterNode = (filterFn: (node: Node) => boolean) => {
+  filterNode = (
+    filterFn: (node: Node) => boolean,
+    checkboxes: Filter,
+    turnVisible?: boolean
+  ) => {
     return (node: Node): boolean => {
-      let isVisible = filterFn(node);
+      const filterReturn = filterFn(node);
+      let isVisible = false;
 
       if (node.children) {
         const filteredChildren: Node[] = [];
         // if one of node's children passes filter then this node is also visible
         node.children.forEach((child) => {
-          if (this.filterNode(filterFn)(child)) {
+          // if the node passes filter and a search is occurring, show the children (according to the checkbox selection)
+          let childFilter;
+          if (
+            !checkboxes.searchHasNoContent &&
+            (filterReturn || turnVisible) &&
+            ((checkboxes.tags && !checkboxes.food && child.isTag) ||
+              !checkboxes.tags ||
+              checkboxes.food)
+          ) {
+            childFilter = this.filterNode(filterFn, checkboxes, true)(child);
+            childFilter && filteredChildren.push(child);
+          }
+
+          if (childFilter === undefined) {
+            childFilter = this.filterNode(filterFn, checkboxes)(child);
+          }
+          if (childFilter) {
             isVisible = true;
-            filteredChildren.push(child);
+            if (!filteredChildren.includes(child)) {
+              filteredChildren.push(child);
+            }
           }
         });
         node.children = filteredChildren;
       }
-      return isVisible;
+      return isVisible || turnVisible || filterReturn;
     };
   };
 

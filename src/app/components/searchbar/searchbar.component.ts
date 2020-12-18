@@ -81,7 +81,8 @@ export class SearchbarComponent {
           (searchHasNoContent ||
             this._generateListOfFilteredNodes(selectedValues, node))
         );
-      }
+      },
+      { food: this.food, tags: this.tags, searchHasNoContent }
     );
     // Switch the tree to food items if the Food checkbox is set
     if (this.food && !this.tags) {
