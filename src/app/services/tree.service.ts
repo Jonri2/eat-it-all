@@ -325,7 +325,11 @@ export class TreeService {
 
     for (let node of nodes) {
       if (node?.id === id) {
-        node.children.push(nodeToAdd);
+        if (node.children) {
+          node.children.push(nodeToAdd);
+        } else {
+          node.children = [nodeToAdd];
+        }
         break;
       }
       if (node?.children) {
