@@ -4,7 +4,7 @@ import { Tree, Node } from 'src/app/interfaces/interfaces';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { fuzzySearch } from 'src/app/utils';
-import { map, intersectionWith, isEqual } from 'lodash';
+import { map, intersectionWith, isEqual, uniqBy } from 'lodash';
 
 interface SelectedValues {
   selectedValues: string[];
@@ -83,7 +83,7 @@ export class SearchbarComponent {
     );
     // Switch the tree to food items if the Food checkbox is set
     if (this.food && !this.tags) {
-      tree.treeModel.nodes = this.listOfFilteredNodes;
+      tree.treeModel.nodes = uniqBy(this.listOfFilteredNodes, 'name');
     } else {
       tree.treeModel.nodes = nodes;
     }
