@@ -18,6 +18,7 @@ interface SelectedValues {
 })
 export class SearchbarComponent {
   listOfFilteredNodes: Node[] = [];
+  selectedValues: string[] = [];
   @Input() food: boolean = true;
   @Input() tags: boolean = true;
 
@@ -27,7 +28,7 @@ export class SearchbarComponent {
   ) {
     this.treeSvc.nodeAdded.subscribe(() => {
       if (this.tags && !this.food) {
-        this.filterTree({ selectedValues: [] })();
+        this.filterTree({ selectedValues: this.selectedValues })();
       }
     });
     this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
@@ -39,7 +40,8 @@ export class SearchbarComponent {
     tree.treeModel.nodes = this.treeSvc.getLocalNodes();
     this.sharedDataSvc.setTree(tree);
     const searchHasContent = selectedValues.length === 0;
-    this._updateTreeNodes(searchHasContent, selectedValues);
+    this.selectedValues = selectedValues;
+    this._updateTreeNodes(searchHasContent);
 
     // Update counter based on search
     if (searchHasContent) {
@@ -55,10 +57,7 @@ export class SearchbarComponent {
   };
 
   /* Dynamically update nodes that are being shown */
-  private _updateTreeNodes(
-    searchHasNoContent: boolean,
-    selectedValues: string[]
-  ) {
+  private _updateTreeNodes(searchHasNoContent: boolean) {
     this.listOfFilteredNodes = [];
     const tree: Tree = this.sharedDataSvc.getTree();
     const nodes: Node[] = this.treeSvc.filterNodes(
@@ -71,15 +70,14 @@ export class SearchbarComponent {
           // If only the Food checkbox is selected, add the food nodes to the filtered nodes list
         } else if (this.food && !this.tags) {
           if (!node.isTag) {
-            this._generateListOfFilteredNodes(selectedValues, node);
+            this._generateListOfFilteredNodes(node);
           }
         }
         // If there is no search, don't filter the list
         // If there is, check if the node is found in the search. Filter it out if it is not
         return (
           showNode &&
-          (searchHasNoContent ||
-            this._generateListOfFilteredNodes(selectedValues, node))
+          (searchHasNoContent || this._generateListOfFilteredNodes(node))
         );
       },
       { food: this.food, tags: this.tags, searchHasNoContent }
@@ -96,15 +94,23 @@ export class SearchbarComponent {
   /* Check if the node searched for exists and make a list.
     Return: true, if the node exists, false otherwise.
   */
-  private _generateListOfFilteredNodes(
-    selectedValues: string[],
-    node: Node
-  ): boolean {
-    const nodeExists = fuzzySearch(selectedValues, node.name);
+  private _generateListOfFilteredNodes(node: Node): boolean {
+    const nodeExists = fuzzySearch(this.selectedValues, node.name);
     const ids = map(this.listOfFilteredNodes, 'id');
-    (!selectedValues.length || nodeExists) &&
+    if (
+      (!this.selectedValues.length || nodeExists) &&
       !ids.includes(node.id) &&
+      !this._isFiltered(node)
+    ) {
       this.listOfFilteredNodes.push(node);
+    }
     return nodeExists;
+  }
+
+  private _isFiltered(node: Node): boolean {
+    return (
+      (!this.tags && this.food && node.isTag) ||
+      (this.tags && !this.food && !node.isTag)
+    );
   }
 }
