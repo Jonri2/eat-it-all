@@ -22,15 +22,15 @@
   >
     Login
   </button>
-  <button
-    mat-raised-button
-    color="accent"
-    [disabled]="!f.valid"
-    (click)="createAccount()"
-    class="login-field"
-  >
-    Create Account
-  </button>
-  <a (click)="resetPassword()" class="login-field">Forgot Password?</a>
-  <p *ngIf="isError" class="error">{{ errorMessage }}</p>
 </form>
+<button
+  mat-raised-button
+  color="accent"
+  [disabled]="!f.valid"
+  (click)="createAccount()"
+  class="login-field"
+>
+  Create Account
+</button>
+<a (click)="resetPassword()" class="login-field">Forgot Password?</a>
+<p *ngIf="isError" class="error">{{ errorMessage }}</p>

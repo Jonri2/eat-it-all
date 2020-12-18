@@ -27,7 +27,7 @@ export class LoginPageComponent implements OnInit {
     try {
       await this.authSvc.loginUser(this.email, this.password);
       this.treeSvc.onLogin(this.email);
-      window.localStorage.setItem("email", this.email);
+      window.localStorage.setItem('email', this.email);
       this.router.navigateByUrl('list');
     } catch (error) {
       this.isError = true;
