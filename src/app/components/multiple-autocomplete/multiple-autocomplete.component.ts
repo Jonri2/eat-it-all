@@ -22,7 +22,7 @@ import {
 } from 'rxjs/operators';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
-import { forEach, union } from 'lodash';
+import { forEach, union, orderBy } from 'lodash';
 
 // https://material.angular.io/components/chips/overview
 // debounce ref: https://stackoverflow.com/questions/41308826/angular-2-debounce-ngmodelchange/52977862#52977862
@@ -56,7 +56,7 @@ export class MultipleAutocompleteComponent {
       forEach(res.nodes, (node) => {
         this.getNames(node);
       });
-      this.allOptions = union(this.allOptions);
+      this.allOptions = orderBy(union(this.allOptions), (o) => o.toLowerCase());
     });
 
     // Debounce is set to 30ms, since value changes frequently, which is imperceptible to the user.
