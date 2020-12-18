@@ -66,7 +66,7 @@ export class TreeService {
       forEach(node.tags, (tag, i) => {
         node.id = `${nodeId}-${i}`;
         forEach(this._nodes, (topNode) => {
-          this.searchTree(tag, node, topNode);
+          this.searchTree(tag, cloneDeep(node), topNode);
         });
       });
     } else if (!this._getNames(this._nodes).includes(node.name)) {
@@ -95,36 +95,36 @@ export class TreeService {
   onLogin = (email: string) => {
     this.userEmail = email;
     // Run this to reset the db
-    // this.getUserDoc().set({
-    //   nodes: [
-    //     {
-    //       id: 1,
-    //       name: 'Fruit',
-    //       children: [
-    //         { id: 2, name: '🍎 Apple' },
-    //         { id: 8, name: '🍋 Lemon' },
-    //         { id: 9, name: '🍋🟩 Lime' },
-    //         { id: 10, name: '🍊 Orange' },
-    //         { id: 11, name: '🍓 Strawberry' },
-    //       ],
-    //       isTag: true,
-    //     },
-    //     {
-    //       id: 4,
-    //       name: 'Meat',
-    //       children: [
-    //         { id: 5, name: '🐔 Cooked Chicken' },
-    //         {
-    //           id: 6,
-    //           name: '🐄 Cow Related',
-    //           children: [{ id: 7, name: '🍔 Hamburger' }],
-    //           isTag: true,
-    //         },
-    //       ],
-    //       isTag: true,
-    //     },
-    //   ],
-    // });
+    //   this.getUserDoc().set({
+    //     nodes: [
+    //       {
+    //         id: 1,
+    //         name: 'Fruit',
+    //         children: [
+    //           { id: 2, name: '🍎 Apple' },
+    //           { id: 8, name: '🍋 Lemon' },
+    //           { id: 9, name: '🍋🟩 Lime' },
+    //           { id: 10, name: '🍊 Orange' },
+    //           { id: 11, name: '🍓 Strawberry' },
+    //         ],
+    //         isTag: true,
+    //       },
+    //       {
+    //         id: 4,
+    //         name: 'Meat',
+    //         children: [
+    //           { id: 5, name: '🐔 Cooked Chicken' },
+    //           {
+    //             id: 6,
+    //             name: '🐄 Cow Related',
+    //             children: [{ id: 7, name: '🍔 Hamburger' }],
+    //             isTag: true,
+    //           },
+    //         ],
+    //         isTag: true,
+    //       },
+    //     ],
+    //   });
   };
 
   hasTag = (tag: string, node?: Node): boolean => {
@@ -253,10 +253,14 @@ export class TreeService {
   };
 
   moveNode = (from: Node['id'], to: Node['id']): boolean => {
-    const nodeToMove: Node = this.getAndRemoveById(from);
-    this.addNodeAtId(nodeToMove, to);
-    this.nodeAddedSubject.next();
-    return nodeToMove !== undefined;
+    if (from !== to) {
+      const nodeToMove: Node = this.getAndRemoveById(from);
+      to.toString().length === 13
+        ? this.addNodeAtId(nodeToMove)
+        : this.addNodeAtId(nodeToMove, to);
+      this.nodeAddedSubject.next();
+      return nodeToMove !== undefined;
+    }
   };
 
   getAndRemoveById = (id: Node['id'], nodes?: Node[]): Node => {
@@ -299,10 +303,16 @@ export class TreeService {
     }
   };
 
-  addNodeAtId = (nodeToAdd: Node, id: Node['id'], nodes?: Node[]) => {
+  addNodeAtId = (nodeToAdd: Node, id?: Node['id'], nodes?: Node[]) => {
     if (!nodes) {
       nodes = this._nodes;
     }
+
+    if (!id) {
+      this._nodes.push(nodeToAdd);
+      return;
+    }
+
     for (let node of nodes) {
       if (node?.id === id) {
         node.children.push(nodeToAdd);
