@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Node } from 'src/app/interfaces/interfaces';
 import { TreeService } from 'src/app/services/tree.service';
 import { v4 } from 'uuid';
@@ -24,13 +25,14 @@ export class AddTagTabComponent {
     this.node.tags = tags;
   };
 
-  onSubmit = () => {
+  onSubmit = (form: NgForm) => {
     this.node.id = v4();
     this.treeSvc.addNode(this.node);
     this.node = {
       name: '',
     };
     this.tagsComponent.clearSelections();
+    form.resetForm();
     this.submitted.emit(true);
   };
 }

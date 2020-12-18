@@ -11,6 +11,8 @@ import { pickBy, identity, forEach } from 'lodash';
 import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
+import { formatCurrency } from '@angular/common';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -47,7 +49,7 @@ export class AddFoodTabComponent {
     this.node.tags = tags;
   };
 
-  onSubmit = () => {
+  onSubmit = (form: NgForm) => {
     this.node.id = v4();
     this.node.rating = this.currentRate;
     // Remove all falsy values
@@ -62,16 +64,17 @@ export class AddFoodTabComponent {
 
     this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
 
-    if (!this.isEditing) {
-      this.node = {
-        name: '',
-        location: undefined,
-        date: undefined,
-      };
-      this.currentRate = 0;
-      this.tagsComponent.clearSelections();
-    }
+    // if (!this.isEditing) {
+    this.node = {
+      name: '',
+      location: undefined,
+      date: undefined,
+    };
+    this.currentRate = 0;
+    this.tagsComponent.clearSelections();
+    // }
 
+    form.resetForm();
     this.submitted.emit(true);
   };
 
