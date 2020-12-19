@@ -35,11 +35,13 @@ export class TreeService {
   }
 
   getUserDoc = () => {
-    const userDoc = this.db
-      .collection('users')
-      .doc<{ nodes: Node[] }>(this.userEmail);
-    this.isLoading = false;
-    return userDoc;
+    if (this.userEmail) {
+      const userDoc = this.db
+        .collection('users')
+        .doc<{ nodes: Node[] }>(this.userEmail);
+      this.isLoading = false;
+      return userDoc;
+    }
   };
 
   setUserDoc = (email: string) => {
