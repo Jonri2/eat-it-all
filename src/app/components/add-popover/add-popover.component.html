@@ -5,7 +5,7 @@
   mdePopoverTriggerOn="click"
   #popoverTrigger="mdePopoverTrigger"
 >
-  <mat-icon>{{buttonType}}</mat-icon>
+  <mat-icon>{{ buttonType }}</mat-icon>
 </button>
 
 <mde-popover
@@ -16,7 +16,10 @@
   <mat-card class="card">
     <mat-tab-group>
       <mat-tab label="Food">
-        <app-add-food-tab isEditing="isEditingFood" (submitted)="closePopover()"></app-add-food-tab>
+        <app-add-food-tab
+          [isEditing]="isEditingFood"
+          (submitted)="closePopover()"
+        ></app-add-food-tab>
       </mat-tab>
       <mat-tab *ngIf="!isEditingFood" label="Tag">
         <app-add-tag-tab (submitted)="closePopover()"></app-add-tag-tab>

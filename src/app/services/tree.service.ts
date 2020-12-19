@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Filter, Node, Tree } from '../interfaces/interfaces';
+import { Filter, Node } from '../interfaces/interfaces';
 import { forEach } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
 import { map, filter, cloneDeep, orderBy } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
-import { SharedTreeDataService } from './shared-tree-data.service';
 
 const resetTestData = false;
 
@@ -52,22 +51,12 @@ export class TreeService {
     return this.getUserDoc().valueChanges();
   };
 
-  addNode = (node: Node, oldNode?: Node) => {
-    if (oldNode) {
-      // // Copy over the id
-      // TODO: need to do some hard logic to remove the node
-      // node.id = oldNode.data.id;
-      // const index = this._nodes.indexOf();
-      // if (index > -1) {
-      //   this._nodes.splice(index, 1);
-      //   console.log("delete")
-      // }
-    }
+  addNode = (node: Node) => {
     this.nodeAddPending = true;
     if (node.tags && node.tags.length) {
       const nodeId = node.id;
       forEach(node.tags, (tag, i) => {
-        node.id = `${nodeId}-${i}`;
+        node.id = `${nodeId}--${i}`;
         forEach(this._nodes, (topNode) => {
           this.searchTree(tag, cloneDeep(node), topNode);
         });
@@ -76,6 +65,12 @@ export class TreeService {
       this._nodes.push(node);
     }
     this.getUserDoc().set({ nodes: this.sortNodes(this._nodes) });
+  };
+
+  editNode = (newNode: Node, oldNode: Node) => {
+    newNode.id = oldNode.id;
+    this.getAndRemoveById(oldNode.id, undefined, true);
+    this.addNode(newNode);
   };
 
   searchTree = (tag: string, nodeToAdd: Node, currentNode: Node) => {
@@ -271,20 +266,33 @@ export class TreeService {
     }
   };
 
-  getAndRemoveById = (id: Node['id'], nodes?: Node[]): Node => {
+  getAndRemoveById = (
+    id: Node['id'],
+    nodes?: Node[],
+    includeDuplicates?: boolean
+  ): Node => {
     let foundNode: Node;
     if (!nodes) {
       nodes = this._nodes;
     }
+    if (includeDuplicates) {
+      [id] = id.split('--');
+    }
+
     for (let node of nodes) {
-      if (node?.id === id) {
+      const targetNodeId = includeDuplicates
+        ? node?.id.toString().split('--')[0]
+        : node?.id;
+      if (targetNodeId === id) {
         foundNode = node;
         this.removeNode(node);
-        break;
+        if (!includeDuplicates) {
+          break;
+        }
       }
       if (node?.children) {
-        foundNode = this.getAndRemoveById(id, node.children);
-        if (foundNode) {
+        foundNode = this.getAndRemoveById(id, node.children, includeDuplicates);
+        if (foundNode && !includeDuplicates) {
           break;
         }
       }

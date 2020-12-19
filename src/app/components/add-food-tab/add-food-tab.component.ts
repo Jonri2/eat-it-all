@@ -61,7 +61,9 @@ export class AddFoodTabComponent {
       }
     });
 
-    this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
+    this.isEditing
+      ? this.treeSvc.editNode(this.node, this.oldNodeValues.data)
+      : this.treeSvc.addNode(this.node);
 
     this.node = {
       name: '',
