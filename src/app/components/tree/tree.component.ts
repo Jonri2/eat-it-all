@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { IActionMapping, TREE_ACTIONS } from '@circlon/angular-tree-component';
-import { map } from 'lodash';
+import { IActionMapping } from '@circlon/angular-tree-component';
+import { map, cloneDeep } from 'lodash';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
-import { Node, Tree } from '../../interfaces/interfaces';
+import { Filter, Node, Tree } from '../../interfaces/interfaces';
 
 // References: https://stackoverflow.com/a/41427647/9931154
 @Component({
@@ -14,7 +14,9 @@ import { Node, Tree } from '../../interfaces/interfaces';
 })
 export class TreeComponent implements OnInit, AfterViewInit {
   nodes: Node[] = [];
+  foodNodes: Node[] = [];
   clickedNode: Node;
+  filter: Filter;
   // get handle on tree template variable
   @ViewChild('myCoolTree') tree: Tree;
 
@@ -27,11 +29,20 @@ export class TreeComponent implements OnInit, AfterViewInit {
       },
       drop: (tree, node, $event, { from, to }) => {
         if (
-          !map(to.parent.children, 'id').includes(from.data.id) &&
-          to.parent.data.isTag
+          !map(map(to.parent.children, 'data'), 'name').includes(
+            from.data.name
+          ) &&
+          (to.parent.data.isTag || !to.parent.parent)
         ) {
-          TREE_ACTIONS.MOVE_NODE(tree, node, $event, { from, to });
-          this.treeSvc.setNodes(this.nodes);
+          if (
+            this.treeSvc.moveNode(
+              from.data.id,
+              to.parent.data.id,
+              to.parent.data.name
+            )
+          ) {
+            this.treeSvc.setNodes();
+          }
         }
       },
     },
@@ -51,15 +62,33 @@ export class TreeComponent implements OnInit, AfterViewInit {
     private sharedDataSvc: SharedTreeDataService,
     private router: Router
   ) {
+    this.treeSvc.filter$.subscribe((filter: Filter) => {
+      this.filter = filter;
+    });
     this.treeSvc.getNodes().subscribe((res) => {
-      this.nodes = res.nodes;
+      if (this.filter.food && !this.filter.tags) {
+        const addedNode: Node = this.treeSvc.getDiff(this.nodes, res.nodes);
+        if (addedNode) {
+          const foodNodesCopy = cloneDeep(this.foodNodes);
+          foodNodesCopy.push(addedNode);
+          this.foodNodes = foodNodesCopy;
+        }
+      }
+      if (this.filter?.food || !this.filter?.tags) {
+        this.nodes = res.nodes;
+      }
     });
     this.sharedDataSvc.tree.subscribe((tree: Tree) => {
-      const nodes: Node[] = map(tree.treeModel?.nodes, 'data');
-      this.nodes =
-        nodes.length > 0 && !nodes.includes(undefined)
-          ? nodes
+      const tempNodes: Node[] = map(tree.treeModel?.nodes, 'data');
+      const nodes: Node[] =
+        tempNodes.length > 0 && !tempNodes.includes(undefined)
+          ? tempNodes
           : tree.treeModel?.nodes;
+      if (this.filter?.food && !this.filter?.tags) {
+        this.foodNodes = nodes;
+      } else {
+        this.nodes = nodes;
+      }
     });
   }
 

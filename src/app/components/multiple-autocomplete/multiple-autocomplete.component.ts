@@ -22,7 +22,7 @@ import {
 } from 'rxjs/operators';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../interfaces/interfaces';
-import { forEach } from 'lodash';
+import { forEach, union, orderBy } from 'lodash';
 
 // https://material.angular.io/components/chips/overview
 // debounce ref: https://stackoverflow.com/questions/41308826/angular-2-debounce-ngmodelchange/52977862#52977862
@@ -38,6 +38,7 @@ export class MultipleAutocompleteComponent {
   searchCtrl = new FormControl();
   filteredOptions: Observable<string[]>;
   allOptions: string[] = [];
+  tagsChecked: boolean = false;
 
   @Input() selectedValues: string[] = [];
   @Input() separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -52,11 +53,21 @@ export class MultipleAutocompleteComponent {
 
   constructor(private treeSvc: TreeService) {
     this.treeSvc.getNodes().subscribe((res) => {
-      this.allOptions = [];
-      forEach(res.nodes, (node) => {
-        this.getNames(node);
-      });
+      this.getAllOptions(res.nodes);
     });
+
+    this.treeSvc.filter$.subscribe((filter) => {
+      this.tagsChecked = filter.tags && !filter.food;
+      this.getAllOptions(this.treeSvc.getLocalNodes());
+    });
+  }
+
+  getAllOptions = (nodes: Node[]) => {
+    this.allOptions = [];
+    forEach(nodes, (node) => {
+      this.getNames(node);
+    });
+    this.allOptions = orderBy(union(this.allOptions), (o) => o.toLowerCase());
 
     // Debounce is set to 30ms, since value changes frequently, which is imperceptible to the user.
     this.filteredOptions = this.searchCtrl.valueChanges
@@ -67,10 +78,10 @@ export class MultipleAutocompleteComponent {
           val ? this._filter(val) : this.allOptions.slice()
         )
       );
-  }
+  };
 
   getNames = (node: Node) => {
-    if (this.tagsOnly) {
+    if (this.tagsOnly || (!this.tagsOnly && this.tagsChecked)) {
       if (node.isTag) {
         this.allOptions.push(node.name);
       }
@@ -82,19 +93,11 @@ export class MultipleAutocompleteComponent {
     });
   };
 
-  /* Runs when the model changes (ngModelChange)
-   */
-  onChange = () => {
-    if (this.callback) {
-      this.callback();
-    }
-  };
-
   add = (event: MatChipInputEvent): void => {
     const input = event.input;
     const value = event.value;
 
-    // Add our fruit
+    // Add our value
     if ((value || '').trim()) {
       this.selectedValues.push(value.trim());
     }
@@ -106,6 +109,7 @@ export class MultipleAutocompleteComponent {
 
     this.searchCtrl.setValue(null);
     this.values.emit(this.selectedValues);
+    this.invokeCallback();
   };
 
   remove = (value: string): void => {
@@ -115,9 +119,7 @@ export class MultipleAutocompleteComponent {
       this.selectedValues.splice(index, 1);
     }
     this.values.emit(this.selectedValues);
-    if (this.callback) {
-      this.callback();
-    }
+    this.invokeCallback();
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
@@ -125,6 +127,13 @@ export class MultipleAutocompleteComponent {
     this.searchInput.nativeElement.value = '';
     this.searchCtrl.setValue(null);
     this.values.emit(this.selectedValues);
+    this.invokeCallback();
+  };
+
+  invokeCallback = () => {
+    if (this.callback) {
+      this.callback();
+    }
   };
 
   clearSelections = () => {

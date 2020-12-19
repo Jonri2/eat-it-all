@@ -10,10 +10,13 @@ export class AddPopoverComponent {
   @ViewChild(MdePopoverTrigger, { static: false }) trigger: MdePopoverTrigger;
 
   @Input() buttonType: string = 'add';
+  @Input() editType: string = 'none';
   isEditingFood: boolean = false;
+  isEditingTag: boolean = false;
 
-  ngOnInit () {
-    this.isEditingFood = this.buttonType === 'edit';
+  ngOnInit() {
+    this.isEditingFood = this.editType === 'food';
+    this.isEditingTag = this.editType === 'tag';
   }
 
   closePopover = () => {

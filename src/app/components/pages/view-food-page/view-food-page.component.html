@@ -1,6 +1,10 @@
 <div class="view-food-page">
   <button mat-flat-button routerLink="/list">Back to list</button>
-  <app-add-popover class="block" buttonType="edit"></app-add-popover>
+  <app-add-popover
+    class="block"
+    buttonType="edit"
+    [editType]="node?.isTag || node?.data?.isTag ? 'tag' : 'food'"
+  ></app-add-popover>
   <div class="content">
     <mat-card *ngIf="!isTreeLoading && !!node" class="food-card">
       <app-animated [value]="node?.data?.name || node?.name"> </app-animated>
@@ -11,7 +15,7 @@
           >{{ tag }}</mat-chip
         >
       </mat-chip-list>
-      <mat-card-content>
+      <mat-card-content *ngIf="!(node?.isTag || node?.data?.isTag)">
         <p>{{ node?.data?.location || node?.location }}</p>
         <mat-card-subtitle>{{
           node?.data?.date || node?.date
@@ -22,7 +26,6 @@
           [max]="5"
           [readonly]="true"
         ></ngb-rating>
-        <small class="block">{{ node?.data?.id || node?.id }}</small>
       </mat-card-content>
     </mat-card>
 

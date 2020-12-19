@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -11,13 +12,15 @@ import { pickBy, identity, forEach } from 'lodash';
 import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-food-tab',
   templateUrl: './add-food-tab.component.html',
   styleUrls: ['./add-food-tab.component.scss'],
 })
-export class AddFoodTabComponent {
+export class AddFoodTabComponent implements OnInit {
   node: Node = {
     name: '',
     location: undefined,
@@ -32,12 +35,9 @@ export class AddFoodTabComponent {
 
   constructor(
     private treeSvc: TreeService,
-    private sharedTreeSvc: SharedTreeDataService
-  ) {
-    this.treeSvc.getNodes().subscribe(() => {
-      this.treeSvc.nodeAddedCallback();
-    });
-  }
+    private sharedTreeSvc: SharedTreeDataService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this._setEditingValues();
@@ -51,7 +51,7 @@ export class AddFoodTabComponent {
     this.node.tags = tags;
   };
 
-  onSubmit = () => {
+  onSubmit = (form: NgForm) => {
     this.node.id = v4();
     this.node.rating = this.currentRate;
     // Remove all falsy values
@@ -64,23 +64,25 @@ export class AddFoodTabComponent {
       }
     });
 
-    this.treeSvc.addNode(this.node, this.isEditing && this.oldNodeValues);
+    this.isEditing
+      ? this.treeSvc.editNode(this.node, this.oldNodeValues.data)
+      : this.treeSvc.addNode(this.node);
 
-    if (!this.isEditing) {
-      this.node = {
-        name: '',
-        location: undefined,
-        date: undefined,
-      };
-      this.currentRate = 0;
-      this.tagsComponent.clearSelections();
-    }
+    this.node = {
+      name: '',
+      location: undefined,
+      date: undefined,
+    };
+    this.currentRate = 0;
+    this.tagsComponent.clearSelections();
 
+    form.resetForm();
     this.submitted.emit(true);
+    this.isEditing && this.router.navigateByUrl('/list');
   };
 
   private _setEditingValues() {
-    if (this.isEditing) {
+    if (this.isEditing && this.sharedTreeSvc.node) {
       const {
         rating,
         location,
@@ -88,7 +90,7 @@ export class AddFoodTabComponent {
         name,
         date,
       } = this.sharedTreeSvc.node.data;
-      this.oldNodeValues = {...this.sharedTreeSvc.node};
+      this.oldNodeValues = { ...this.sharedTreeSvc.node };
       this.currentRate = rating;
       this.node = {
         name,
