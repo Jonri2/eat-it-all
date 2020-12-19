@@ -25,23 +25,23 @@ export class TreeService {
 
   constructor(private db: AngularFirestore) {
     this.userEmail = window.localStorage.getItem('email');
-    this.getNodes().subscribe((res) => {
-      this._nodes = res?.nodes;
-      if (this.nodeAddPending) {
-        this.nodeAddPending = false;
-        this.nodeAddedCallback();
-      }
-    });
+    if (this.userEmail) {
+      this.getNodes().subscribe((res) => {
+        this._nodes = res?.nodes;
+        if (this.nodeAddPending) {
+          this.nodeAddPending = false;
+          this.nodeAddedCallback();
+        }
+      });
+    }
   }
 
   getUserDoc = () => {
-    if (this.userEmail) {
-      const userDoc = this.db
-        .collection('users')
-        .doc<{ nodes: Node[] }>(this.userEmail);
-      this.isLoading = false;
-      return userDoc;
-    }
+    const userDoc = this.db
+      .collection('users')
+      .doc<{ nodes: Node[] }>(this.userEmail);
+    this.isLoading = false;
+    return userDoc;
   };
 
   setUserDoc = (email: string) => {
