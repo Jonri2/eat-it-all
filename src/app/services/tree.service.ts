@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Filter, Node } from '../interfaces/interfaces';
-import { forEach } from 'lodash';
+import { forEach, isEqual, findIndex } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
 import { map, filter, cloneDeep, orderBy } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
@@ -279,12 +279,12 @@ export class TreeService {
       nodes = this._nodes;
     }
     if (includeDuplicates) {
-      [id] = id.split('--');
+      id = this._getDuplicateId(id);
     }
 
     for (let node of nodes) {
       const targetNodeId = includeDuplicates
-        ? node?.id.toString().split('--')[0]
+        ? this._getDuplicateId(node?.id)
         : node?.id;
       if (targetNodeId === id) {
         foundNode = node;
@@ -303,26 +303,48 @@ export class TreeService {
     return foundNode;
   };
 
-  removeNode = (nodeToRemove: Node, nodes?: Node[]) => {
+  removeNode = (
+    nodeToRemove: Node,
+    nodes?: Node[],
+    includeDuplicates?: boolean
+  ) => {
     if (!nodes) {
       nodes = this._nodes;
     }
     for (let node of nodes) {
       if (node?.children) {
-        const index = node.children.indexOf(nodeToRemove);
+        const index = includeDuplicates
+          ? findIndex(node.children, (child) => {
+              return (
+                this._getDuplicateId(child.id) ===
+                this._getDuplicateId(nodeToRemove.id)
+              );
+            })
+          : node.children.indexOf(nodeToRemove);
         if (index > -1) {
           if (nodeToRemove.tags) {
             nodeToRemove.tags.splice(nodeToRemove.tags.indexOf(node.name), 1);
           }
           node.children.splice(index, 1);
-          break;
+          if (!includeDuplicates) {
+            break;
+          }
         }
-        this.removeNode(nodeToRemove, node.children);
+        this.removeNode(nodeToRemove, node.children, includeDuplicates);
       }
-      if (node === nodeToRemove) {
-        this._nodes.splice(this._nodes.indexOf(nodeToRemove), 1);
+      if (
+        isEqual(node, nodeToRemove) ||
+        (includeDuplicates &&
+          this._getDuplicateId(node?.id) ===
+            this._getDuplicateId(nodeToRemove.id))
+      ) {
+        this._nodes.splice(this._nodes.indexOf(node), 1);
       }
     }
+  };
+
+  private _getDuplicateId = (id: Node['id']) => {
+    return id.toString().split('--')[0];
   };
 
   addNodeAtId = (nodeToAdd: Node, id?: Node['id'], nodes?: Node[]) => {
