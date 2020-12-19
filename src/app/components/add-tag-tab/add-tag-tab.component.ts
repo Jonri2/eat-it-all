@@ -47,6 +47,7 @@ export class AddTagTabComponent implements OnInit {
 
   onSubmit = (form: NgForm) => {
     this.node.id = v4();
+    this.node.isTag = true;
 
     // Add tags that haven't already been added
     forEach(this.node.tags, (tag) => {
@@ -54,7 +55,6 @@ export class AddTagTabComponent implements OnInit {
         this.treeSvc.addNode({ id: v4(), name: tag, isTag: true });
       }
     });
-
     this.treeSvc.addNode(this.node);
     this.node = {
       name: '',

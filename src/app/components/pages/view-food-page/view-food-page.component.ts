@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { TreeService } from 'src/app/services/tree.service';
 import { Node } from '../../../interfaces/interfaces';
@@ -18,7 +18,8 @@ export class ViewFoodPageComponent implements OnInit {
   constructor(
     private treeSvc: TreeService,
     private route: ActivatedRoute,
-    private sharedDataSvc: SharedTreeDataService
+    private sharedDataSvc: SharedTreeDataService,
+    private router: Router
   ) {
     this.treeSvc.getNodes().subscribe((res) => {
       this.nodes = res.nodes;
@@ -36,7 +37,9 @@ export class ViewFoodPageComponent implements OnInit {
   */
   private _fallbackData = () => {
     if (this.node === undefined) {
-      [this.node] = this.nodes.filter((n) => (n?.id === this.id) || n?.data?.id === this.id);
+      [this.node] = this.nodes.filter(
+        (n) => n?.id === this.id || n?.data?.id === this.id
+      );
     }
   };
 
@@ -53,4 +56,10 @@ export class ViewFoodPageComponent implements OnInit {
       this._fallbackData();
     }
   }
+
+  remove = () => {
+    this.treeSvc.removeNode(this.node.data, undefined, true);
+    this.treeSvc.setNodes();
+    this.router.navigateByUrl('list');
+  };
 }

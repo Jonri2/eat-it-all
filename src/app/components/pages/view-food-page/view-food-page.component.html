@@ -8,6 +8,9 @@
   <div class="content">
     <mat-card *ngIf="!isTreeLoading && !!node" class="food-card">
       <app-animated [value]="node?.data?.name || node?.name"> </app-animated>
+      <button mat-mini-fab class="delete-button" (click)="remove()">
+        <mat-icon>delete</mat-icon>
+      </button>
       <mat-chip-list aria-label="Food Tags">
         <mat-chip
           [disableRipple]="true"

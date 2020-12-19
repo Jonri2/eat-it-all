@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Filter, Node } from '../interfaces/interfaces';
-import { forEach } from 'lodash';
+import { forEach, isEqual, findIndex } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { map, filter, cloneDeep, orderBy } from 'lodash';
+import { map, filter, cloneDeep, orderBy, concat } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
 
 const resetTestData = false;
@@ -25,6 +25,12 @@ export class TreeService {
 
   constructor(private db: AngularFirestore) {
     this.userEmail = window.localStorage.getItem('email');
+    if (this.userEmail) {
+      this.subscribeToDb();
+    }
+  }
+
+  subscribeToDb = () => {
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
       if (this.nodeAddPending) {
@@ -32,7 +38,7 @@ export class TreeService {
         this.nodeAddedCallback();
       }
     });
-  }
+  };
 
   getUserDoc = () => {
     const userDoc = this.db
@@ -91,6 +97,7 @@ export class TreeService {
 
   onLogin = (email: string) => {
     this.userEmail = email;
+    this.subscribeToDb();
     // Run this to reset the db
     if (resetTestData) {
       this.getUserDoc().set({
@@ -99,11 +106,11 @@ export class TreeService {
             id: 1,
             name: 'Fruit',
             children: [
-              { id: 2, name: '🍎 Apple' },
-              { id: 8, name: '🍋 Lemon' },
-              { id: 9, name: '🍋🟩 Lime' },
-              { id: 10, name: '🍊 Orange' },
-              { id: 11, name: '🍓 Strawberry' },
+              { id: 2, name: '🍎 Apple', tags: ['Fruit'] },
+              { id: 8, name: '🍋 Lemon', tags: ['Fruit'] },
+              { id: 9, name: '🍋🟩 Lime', tags: ['Fruit'] },
+              { id: 10, name: '🍊 Orange', tags: ['Fruit'] },
+              { id: 11, name: '🍓 Strawberry', tags: ['Fruit'] },
             ],
             isTag: true,
           },
@@ -111,11 +118,13 @@ export class TreeService {
             id: 4,
             name: 'Meat',
             children: [
-              { id: 5, name: '🐔 Cooked Chicken' },
+              { id: 5, name: '🐔 Cooked Chicken', tags: ['Meat'] },
               {
                 id: 6,
                 name: '🐄 Cow Related',
-                children: [{ id: 7, name: '🍔 Hamburger' }],
+                children: [
+                  { id: 7, name: '🍔 Hamburger', tags: ['🐄 Cow Related'] },
+                ],
                 isTag: true,
               },
             ],
@@ -279,12 +288,12 @@ export class TreeService {
       nodes = this._nodes;
     }
     if (includeDuplicates) {
-      [id] = id.split('--');
+      id = this._getDuplicateId(id);
     }
 
     for (let node of nodes) {
       const targetNodeId = includeDuplicates
-        ? node?.id.toString().split('--')[0]
+        ? this._getDuplicateId(node?.id)
         : node?.id;
       if (targetNodeId === id) {
         foundNode = node;
@@ -303,26 +312,71 @@ export class TreeService {
     return foundNode;
   };
 
-  removeNode = (nodeToRemove: Node, nodes?: Node[]) => {
+  removeNode = (
+    nodeToRemove: Node,
+    nodes?: Node[],
+    includeDuplicates?: boolean
+  ) => {
     if (!nodes) {
       nodes = this._nodes;
     }
     for (let node of nodes) {
       if (node?.children) {
-        const index = node.children.indexOf(nodeToRemove);
+        const index = includeDuplicates
+          ? findIndex(node.children, (child) => {
+              return (
+                this._getDuplicateId(child.id) ===
+                this._getDuplicateId(nodeToRemove.id)
+              );
+            })
+          : node.children.indexOf(nodeToRemove);
         if (index > -1) {
           if (nodeToRemove.tags) {
             nodeToRemove.tags.splice(nodeToRemove.tags.indexOf(node.name), 1);
           }
+          const nodeChildren: Node[] = node.children[index].children;
+          const nodeName: Node['name'] = node.children[index].name;
           node.children.splice(index, 1);
-          break;
+          if (includeDuplicates && nodeToRemove.isTag) {
+            node.children = concat(node.children, nodeChildren);
+            this.removeTagFromAll(nodeName);
+          }
+          if (!includeDuplicates) {
+            break;
+          }
         }
-        this.removeNode(nodeToRemove, node.children);
+        this.removeNode(nodeToRemove, node.children, includeDuplicates);
       }
-      if (node === nodeToRemove) {
-        this._nodes.splice(this._nodes.indexOf(nodeToRemove), 1);
+      if (
+        isEqual(node, nodeToRemove) ||
+        (includeDuplicates &&
+          this._getDuplicateId(node?.id) ===
+            this._getDuplicateId(nodeToRemove.id))
+      ) {
+        const index = this._nodes.indexOf(node);
+        const nodeChildren: Node[] = this._nodes[index].children;
+        const nodeName: Node['name'] = this._nodes[index].name;
+        this._nodes.splice(index, 1);
+        if (includeDuplicates && nodeToRemove.isTag) {
+          this._nodes = concat(
+            this._nodes,
+            filter(nodeChildren, (child) => {
+              return (
+                child.isTag ||
+                !child.tags ||
+                child.tags?.length === 0 ||
+                isEqual(child.tags, [nodeName])
+              );
+            })
+          );
+          this.removeTagFromAll(nodeName);
+        }
       }
     }
+  };
+
+  private _getDuplicateId = (id: Node['id']): string => {
+    return id.toString().split('--')[0];
   };
 
   addNodeAtId = (nodeToAdd: Node, id?: Node['id'], nodes?: Node[]) => {
@@ -348,6 +402,21 @@ export class TreeService {
         this.addNodeAtId(nodeToAdd, id, node.children);
       }
     }
+  };
+
+  removeTagFromAll = (tag: string, nodes?: Node[]) => {
+    if (!nodes) {
+      nodes = this._nodes;
+    }
+    forEach(nodes, (node) => {
+      const index = node.tags?.indexOf(tag);
+      if (index > -1) {
+        node.tags.splice(index, 1);
+      }
+      if (node.children) {
+        this.removeTagFromAll(tag, node.children);
+      }
+    });
   };
 
   sortNodes = (nodes: Node[]): Node[] => {
