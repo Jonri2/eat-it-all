@@ -149,7 +149,7 @@ export class TreeService {
   };
 
   setNodes = () => {
-    this.getUserDoc().set({ nodes: this._nodes });
+    this.getUserDoc().set({ nodes: this.sortNodes(this._nodes) });
   };
 
   getLocalNodes = () => {
@@ -254,8 +254,12 @@ export class TreeService {
   moveNode = (from: Node['id'], to: Node['id'], toTag: string): boolean => {
     if (from !== to) {
       const nodeToMove: Node = this.getAndRemoveById(from);
-      if (nodeToMove.tags) {
-        nodeToMove.tags.push(toTag);
+      if (toTag) {
+        if (nodeToMove.tags) {
+          nodeToMove.tags.push(toTag);
+        } else {
+          nodeToMove.tags = [toTag];
+        }
       }
       to.toString().length < 15 && to.toString().length > 10
         ? this.addNodeAtId(nodeToMove)
