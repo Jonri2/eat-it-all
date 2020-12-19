@@ -26,15 +26,19 @@ export class TreeService {
   constructor(private db: AngularFirestore) {
     this.userEmail = window.localStorage.getItem('email');
     if (this.userEmail) {
-      this.getNodes().subscribe((res) => {
-        this._nodes = res?.nodes;
-        if (this.nodeAddPending) {
-          this.nodeAddPending = false;
-          this.nodeAddedCallback();
-        }
-      });
+      this.subscribeToDb();
     }
   }
+
+  subscribeToDb = () => {
+    this.getNodes().subscribe((res) => {
+      this._nodes = res?.nodes;
+      if (this.nodeAddPending) {
+        this.nodeAddPending = false;
+        this.nodeAddedCallback();
+      }
+    });
+  };
 
   getUserDoc = () => {
     const userDoc = this.db
@@ -93,6 +97,7 @@ export class TreeService {
 
   onLogin = (email: string) => {
     this.userEmail = email;
+    this.subscribeToDb();
     // Run this to reset the db
     if (resetTestData) {
       this.getUserDoc().set({
