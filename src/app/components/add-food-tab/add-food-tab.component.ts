@@ -12,6 +12,7 @@ import { v4 } from 'uuid';
 import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple-autocomplete.component';
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -33,7 +34,8 @@ export class AddFoodTabComponent {
 
   constructor(
     private treeSvc: TreeService,
-    private sharedTreeSvc: SharedTreeDataService
+    private sharedTreeSvc: SharedTreeDataService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -75,6 +77,7 @@ export class AddFoodTabComponent {
 
     form.resetForm();
     this.submitted.emit(true);
+    this.isEditing && this.router.navigateByUrl('/list');
   };
 
   private _setEditingValues() {
