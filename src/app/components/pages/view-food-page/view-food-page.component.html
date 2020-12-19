@@ -11,7 +11,7 @@
           >{{ tag }}</mat-chip
         >
       </mat-chip-list>
-      <mat-card-content>
+      <mat-card-content *ngIf="!(node?.isTag || node?.data?.isTag)">
         <p>{{ node?.data?.location || node?.location }}</p>
         <mat-card-subtitle>{{
           node?.data?.date || node?.date

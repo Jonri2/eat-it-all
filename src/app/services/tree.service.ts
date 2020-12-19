@@ -68,7 +68,6 @@ export class TreeService {
   };
 
   editNode = (newNode: Node, oldNode: Node) => {
-    newNode.id = oldNode.id;
     this.getAndRemoveById(oldNode.id, undefined, true);
     this.addNode(newNode);
   };
