@@ -3,10 +3,10 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Filter, Node } from '../interfaces/interfaces';
 import { forEach, isEqual, findIndex } from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { map, filter, cloneDeep, orderBy } from 'lodash';
+import { map, filter, cloneDeep, orderBy, concat } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
 
-const resetTestData = false;
+const resetTestData = true;
 
 @Injectable({
   providedIn: 'root',
@@ -99,11 +99,11 @@ export class TreeService {
             id: 1,
             name: 'Fruit',
             children: [
-              { id: 2, name: '🍎 Apple' },
-              { id: 8, name: '🍋 Lemon' },
-              { id: 9, name: '🍋🟩 Lime' },
-              { id: 10, name: '🍊 Orange' },
-              { id: 11, name: '🍓 Strawberry' },
+              { id: 2, name: '🍎 Apple', tags: ['Fruit'] },
+              { id: 8, name: '🍋 Lemon', tags: ['Fruit'] },
+              { id: 9, name: '🍋🟩 Lime', tags: ['Fruit'] },
+              { id: 10, name: '🍊 Orange', tags: ['Fruit'] },
+              { id: 11, name: '🍓 Strawberry', tags: ['Fruit'] },
             ],
             isTag: true,
           },
@@ -111,11 +111,13 @@ export class TreeService {
             id: 4,
             name: 'Meat',
             children: [
-              { id: 5, name: '🐔 Cooked Chicken' },
+              { id: 5, name: '🐔 Cooked Chicken', tags: ['Meat'] },
               {
                 id: 6,
                 name: '🐄 Cow Related',
-                children: [{ id: 7, name: '🍔 Hamburger' }],
+                children: [
+                  { id: 7, name: '🍔 Hamburger', tags: ['🐄 Cow Related'] },
+                ],
                 isTag: true,
               },
             ],
@@ -325,7 +327,11 @@ export class TreeService {
           if (nodeToRemove.tags) {
             nodeToRemove.tags.splice(nodeToRemove.tags.indexOf(node.name), 1);
           }
+          const nodeChildren: Node[] = node.children[index].children;
           node.children.splice(index, 1);
+          if (includeDuplicates && nodeToRemove.isTag) {
+            node.children = concat(node.children, nodeChildren);
+          }
           if (!includeDuplicates) {
             break;
           }
@@ -343,7 +349,7 @@ export class TreeService {
     }
   };
 
-  private _getDuplicateId = (id: Node['id']) => {
+  private _getDuplicateId = (id: Node['id']): string => {
     return id.toString().split('--')[0];
   };
 
@@ -371,6 +377,8 @@ export class TreeService {
       }
     }
   };
+
+  removeTagFromAll = (tag: string) => {};
 
   sortNodes = (nodes: Node[]): Node[] => {
     nodes = orderBy(nodes, (node) => node.name.toLowerCase());
