@@ -2,6 +2,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -19,7 +20,7 @@ import { Router } from '@angular/router';
   templateUrl: './add-food-tab.component.html',
   styleUrls: ['./add-food-tab.component.scss'],
 })
-export class AddFoodTabComponent {
+export class AddFoodTabComponent implements OnInit {
   node: Node = {
     name: '',
     location: undefined,

@@ -15,14 +15,17 @@
 >
   <mat-card class="card">
     <mat-tab-group>
-      <mat-tab label="Food">
+      <mat-tab label="Food" *ngIf="!isEditingTag">
         <app-add-food-tab
           [isEditing]="isEditingFood"
           (submitted)="closePopover()"
         ></app-add-food-tab>
       </mat-tab>
       <mat-tab *ngIf="!isEditingFood" label="Tag">
-        <app-add-tag-tab (submitted)="closePopover()"></app-add-tag-tab>
+        <app-add-tag-tab
+          [isEditing]="isEditingTag"
+          (submitted)="closePopover()"
+        ></app-add-tag-tab>
       </mat-tab>
     </mat-tab-group>
   </mat-card>

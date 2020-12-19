@@ -1,6 +1,10 @@
 <div class="view-food-page">
   <button mat-flat-button routerLink="/list">Back to list</button>
-  <app-add-popover class="block" buttonType="edit"></app-add-popover>
+  <app-add-popover
+    class="block"
+    buttonType="edit"
+    [editType]="node?.isTag || node?.data?.isTag ? 'tag' : 'food'"
+  ></app-add-popover>
   <div class="content">
     <mat-card *ngIf="!isTreeLoading && !!node" class="food-card">
       <app-animated [value]="node?.data?.name || node?.name"> </app-animated>

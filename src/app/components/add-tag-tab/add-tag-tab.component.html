@@ -6,9 +6,9 @@
   <app-multiple-autocomplete
     placeholder="Parent Tags"
     width="100%"
-    [separatorKeysCodes]="[]"
     [tagsOnly]="true"
     (values)="onTagsChange($event)"
+    [selectedValues]="node.tags || []"
   ></app-multiple-autocomplete>
   <button mat-raised-button color="primary" type="submit">Submit</button>
 </form>
