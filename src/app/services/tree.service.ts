@@ -6,7 +6,7 @@ import { TreeNode } from '@circlon/angular-tree-component';
 import { map, filter, cloneDeep, orderBy, concat } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
 
-const resetTestData = true;
+const resetTestData = false;
 
 @Injectable({
   providedIn: 'root',
@@ -328,9 +328,11 @@ export class TreeService {
             nodeToRemove.tags.splice(nodeToRemove.tags.indexOf(node.name), 1);
           }
           const nodeChildren: Node[] = node.children[index].children;
+          const nodeName: Node['name'] = node.children[index].name;
           node.children.splice(index, 1);
           if (includeDuplicates && nodeToRemove.isTag) {
             node.children = concat(node.children, nodeChildren);
+            this.removeTagFromAll(nodeName);
           }
           if (!includeDuplicates) {
             break;
@@ -344,7 +346,24 @@ export class TreeService {
           this._getDuplicateId(node?.id) ===
             this._getDuplicateId(nodeToRemove.id))
       ) {
-        this._nodes.splice(this._nodes.indexOf(node), 1);
+        const index = this._nodes.indexOf(node);
+        const nodeChildren: Node[] = this._nodes[index].children;
+        const nodeName: Node['name'] = this._nodes[index].name;
+        this._nodes.splice(index, 1);
+        if (includeDuplicates && nodeToRemove.isTag) {
+          this._nodes = concat(
+            this._nodes,
+            filter(nodeChildren, (child) => {
+              return (
+                child.isTag ||
+                !child.tags ||
+                child.tags?.length === 0 ||
+                isEqual(child.tags, [nodeName])
+              );
+            })
+          );
+          this.removeTagFromAll(nodeName);
+        }
       }
     }
   };
@@ -378,7 +397,20 @@ export class TreeService {
     }
   };
 
-  removeTagFromAll = (tag: string) => {};
+  removeTagFromAll = (tag: string, nodes?: Node[]) => {
+    if (!nodes) {
+      nodes = this._nodes;
+    }
+    forEach(nodes, (node) => {
+      const index = node.tags?.indexOf(tag);
+      if (index > -1) {
+        node.tags.splice(index, 1);
+      }
+      if (node.children) {
+        this.removeTagFromAll(tag, node.children);
+      }
+    });
+  };
 
   sortNodes = (nodes: Node[]): Node[] => {
     nodes = orderBy(nodes, (node) => node.name.toLowerCase());
