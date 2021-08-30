@@ -34,21 +34,23 @@ export class SearchbarComponent {
   }
 
   /* will filter the tree and only display nodes that match selected values */
-  filterTree = ({ selectedValues }: SelectedValues) => () => {
-    const tree: Tree = this.sharedDataSvc.getTree();
-    tree.treeModel.nodes = this.treeSvc.getLocalNodes();
-    this.sharedDataSvc.setTree(tree);
-    const searchHasContent = selectedValues.length === 0;
-    this.selectedValues = selectedValues;
-    this._updateTreeNodes(searchHasContent);
+  filterTree =
+    ({ selectedValues }: SelectedValues) =>
+    () => {
+      const tree: Tree = this.sharedDataSvc.getTree();
+      tree.treeModel.nodes = this.treeSvc.getLocalNodes();
+      this.sharedDataSvc.setTree(tree);
+      const searchHasContent = selectedValues.length === 0;
+      this.selectedValues = selectedValues;
+      this._updateTreeNodes(searchHasContent);
 
-    // Update counter based on search
-    if (searchHasContent) {
-      this.treeSvc.counterCallback(this.treeSvc.getLocalNodes());
-    } else if (this.listOfFilteredNodes.length) {
-      this.treeSvc.counterCallback(this.listOfFilteredNodes);
-    }
-  };
+      // Update counter based on search
+      if (searchHasContent) {
+        this.treeSvc.counterCallback(this.treeSvc.getLocalNodes());
+      } else if (this.listOfFilteredNodes.length) {
+        this.treeSvc.counterCallback(this.listOfFilteredNodes);
+      }
+    };
 
   onCheckboxChange = (event: MatCheckboxChange, values: SelectedValues) => {
     this.treeSvc.filterCallback({ food: this.food, tags: this.tags });
@@ -68,7 +70,7 @@ export class SearchbarComponent {
           showNode = node.isTag;
           // If only the Food checkbox is selected, add the food nodes to the filtered nodes list
         } else if (this.food && !this.tags) {
-          if (!node.isTag) {
+          if (node.isFood) {
             this._generateListOfFilteredNodes(node);
           }
         }
@@ -110,7 +112,7 @@ export class SearchbarComponent {
 
   private _isFiltered(node: Node): boolean {
     return (
-      (!this.tags && this.food && node.isTag) ||
+      (!this.tags && this.food && !node.isFood) ||
       (this.tags && !this.food && !node.isTag)
     );
   }
