@@ -26,6 +26,14 @@
       [max]="5"
     ></ngb-rating>
   </div>
+  <mat-checkbox
+    class="also-tag-checkbox"
+    name="alsoTag"
+    [(ngModel)]="node.isTag"
+    (change)="onCheckboxChange($event)"
+    >Also Tag?</mat-checkbox
+  >
+  <br />
   <button mat-raised-button color="primary" type="submit" [disabled]="!f.valid">
     Submit
   </button>

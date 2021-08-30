@@ -14,6 +14,7 @@ import { MultipleAutocompleteComponent } from '../multiple-autocomplete/multiple
 import { SharedTreeDataService } from 'src/app/services/shared-tree-data.service';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-food-tab',
@@ -51,9 +52,14 @@ export class AddFoodTabComponent implements OnInit {
     this.node.tags = tags;
   };
 
+  onCheckboxChange = (event: MatCheckboxChange) => {
+    this.node.isTag = event.checked;
+  };
+
   onSubmit = (form: NgForm) => {
     this.node.id = v4();
     this.node.rating = this.currentRate;
+    this.node.isFood = true;
     // Remove all falsy values
     this.node = pickBy(this.node, identity);
 
@@ -83,13 +89,8 @@ export class AddFoodTabComponent implements OnInit {
 
   private _setEditingValues() {
     if (this.isEditing && this.sharedTreeSvc.node) {
-      const {
-        rating,
-        location,
-        tags,
-        name,
-        date,
-      } = this.sharedTreeSvc.node.data;
+      const { rating, location, tags, name, date, isTag } =
+        this.sharedTreeSvc.node.data;
       this.oldNodeValues = { ...this.sharedTreeSvc.node };
       this.currentRate = rating;
       this.node = {
@@ -97,6 +98,7 @@ export class AddFoodTabComponent implements OnInit {
         location,
         date,
         tags,
+        isTag,
       };
     }
   }
