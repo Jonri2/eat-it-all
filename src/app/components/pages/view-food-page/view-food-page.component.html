@@ -3,7 +3,7 @@
   <app-add-popover
     class="block"
     buttonType="edit"
-    [editType]="node?.isTag || node?.data?.isTag ? 'tag' : 'food'"
+    [editType]="node?.isFood || node?.data?.isFood ? 'food' : 'tag'"
   ></app-add-popover>
   <div class="content">
     <mat-card *ngIf="!isTreeLoading && !!node" class="food-card">

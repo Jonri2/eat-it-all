@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Filter, Node } from '../interfaces/interfaces';
-import { forEach, isEqual, findIndex } from 'lodash';
+import {
+  forEach,
+  isEqual,
+  findIndex,
+  pull,
+  map,
+  filter,
+  cloneDeep,
+  orderBy,
+  concat,
+} from 'lodash';
 import { TreeNode } from '@circlon/angular-tree-component';
-import { map, filter, cloneDeep, orderBy, concat } from 'lodash';
 import { Subject } from 'rxjs/internal/Subject';
 
 const resetTestData = false;
@@ -33,9 +42,21 @@ export class TreeService {
   subscribeToDb = () => {
     this.getNodes().subscribe((res) => {
       this._nodes = res?.nodes;
+
       if (this.nodeAddPending) {
         this.nodeAddPending = false;
         this.nodeAddedCallback();
+      }
+    });
+  };
+
+  addIsFoodProp = (nodes) => {
+    forEach(nodes, (node: Node) => {
+      if (node && node.isTag === undefined && node.isFood === undefined) {
+        node.isFood = true;
+      }
+      if (node?.children) {
+        this.addIsFoodProp(node.children);
       }
     });
   };
@@ -70,7 +91,7 @@ export class TreeService {
     } else if (!this._getNames(this._nodes).includes(node.name)) {
       this._nodes.push(node);
     }
-    this.getUserDoc().set({ nodes: this.sortNodes(this._nodes) });
+    this.setNodes();
   };
 
   editNode = (newNode: Node, oldNode: Node) => {
@@ -158,6 +179,7 @@ export class TreeService {
   };
 
   setNodes = () => {
+    this.addIsFoodProp(this._nodes);
     this.getUserDoc().set({ nodes: this.sortNodes(this._nodes) });
   };
 
@@ -321,6 +343,9 @@ export class TreeService {
       nodes = this._nodes;
     }
     for (let node of nodes) {
+      if (node === undefined) {
+        nodes = pull(nodes, node);
+      }
       if (node?.children) {
         const index = includeDuplicates
           ? findIndex(node.children, (child) => {
@@ -376,7 +401,7 @@ export class TreeService {
   };
 
   private _getDuplicateId = (id: Node['id']): string => {
-    return id.toString().split('--')[0];
+    return id?.toString().split('--')[0];
   };
 
   addNodeAtId = (nodeToAdd: Node, id?: Node['id'], nodes?: Node[]) => {
@@ -409,20 +434,20 @@ export class TreeService {
       nodes = this._nodes;
     }
     forEach(nodes, (node) => {
-      const index = node.tags?.indexOf(tag);
+      const index = node?.tags?.indexOf(tag);
       if (index > -1) {
         node.tags.splice(index, 1);
       }
-      if (node.children) {
+      if (node?.children) {
         this.removeTagFromAll(tag, node.children);
       }
     });
   };
 
   sortNodes = (nodes: Node[]): Node[] => {
-    nodes = orderBy(nodes, (node) => node.name.toLowerCase());
+    nodes = orderBy(nodes, (node) => node?.name.toLowerCase());
     forEach(nodes, (node) => {
-      if (node.children) {
+      if (node?.children) {
         node.children = this.sortNodes(node.children);
       }
     });

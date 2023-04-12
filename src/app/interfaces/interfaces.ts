@@ -8,6 +8,7 @@ interface CustomNodeFields {
   date?: Date;
   tags?: string[];
   children?: Node[];
+  isFood?: boolean;
   isTag?: boolean;
   isVisible?: boolean;
 }
